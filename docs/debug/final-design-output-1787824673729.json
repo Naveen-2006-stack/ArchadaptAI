@@ -1,0 +1,591 @@
+{
+  "architecturalBrief": {
+    "planningIntent": "Create a Kerala Traditional residential residence tailored for 4 family members in Kochi.",
+    "siteResponse": "E-facing entrance respecting 10ft front setback and 6ft rear buffer.",
+    "orientationStrategy": "Orient main living areas toward E to maximize natural day-lighting and cross ventilation.",
+    "publicPrivateStrategy": "Public formal spaces positioned near front entrance; private bedroom suites secluded toward rear/upper levels.",
+    "serviceStrategy": "Kitchen and wet utilities grouped together for efficient plumbing stacks and exhaust ventilation.",
+    "circulationStrategy": "CENTRAL circulation spine connecting ground-floor entrance to upper level.",
+    "climateStrategy": "Passive stack ventilation core via courtyard and shaded monsoon roof eaves.",
+    "accessibilityStrategy": "Standard single-level transition.",
+    "styleStrategy": "Sloped terracotta roof planes, sit-out verandah, and traditional timber columns."
+  },
+  "spatialGraph": {
+    "nodes": [
+      {
+        "roomId": "room-entrance",
+        "name": "Verandah (Sit-out)",
+        "category": "circulation"
+      },
+      {
+        "roomId": "room-living",
+        "name": "Formal Living Room",
+        "category": "living"
+      },
+      {
+        "roomId": "room-courtyard",
+        "name": "Nadumuttam (Courtyard)",
+        "category": "outdoor"
+      },
+      {
+        "roomId": "room-dining",
+        "name": "Family Dining Hall",
+        "category": "living"
+      },
+      {
+        "roomId": "room-kitchen",
+        "name": "Traditional Kitchen & Pantry",
+        "category": "kitchen"
+      },
+      {
+        "roomId": "room-master",
+        "name": "Ground Floor Master Suite",
+        "category": "bedroom"
+      },
+      {
+        "roomId": "room-master-bath",
+        "name": "Master Ensuite Bath",
+        "category": "bathroom"
+      },
+      {
+        "roomId": "room-bed2",
+        "name": "Upper Bedroom Suite",
+        "category": "bedroom"
+      },
+      {
+        "roomId": "room-lounge",
+        "name": "Upper Family Lounge / Study",
+        "category": "living"
+      },
+      {
+        "roomId": "room-terrace",
+        "name": "Upper Balcony Terrace",
+        "category": "outdoor"
+      },
+      {
+        "roomId": "room-bath2",
+        "name": "Bathroom 2",
+        "category": "bathroom"
+      },
+      {
+        "roomId": "room-bed3",
+        "name": "Bedroom 3",
+        "category": "bedroom"
+      }
+    ],
+    "requiredAdjacencies": [
+      [
+        "room-entrance",
+        "room-living"
+      ],
+      [
+        "room-living",
+        "room-dining"
+      ],
+      [
+        "room-dining",
+        "room-kitchen"
+      ],
+      [
+        "room-master",
+        "room-master-bath"
+      ]
+    ],
+    "preferredAdjacencies": [
+      [
+        "room-living",
+        "room-courtyard"
+      ]
+    ],
+    "avoidAdjacencies": [
+      [
+        "room-master",
+        "room-kitchen"
+      ]
+    ],
+    "verticalConnections": [
+      {
+        "stairId": "stair-1",
+        "connectLevels": [
+          0,
+          1
+        ]
+      }
+    ],
+    "indoorOutdoorConnections": [
+      {
+        "roomId": "room-living",
+        "outdoorSpaceId": "room-courtyard"
+      }
+    ]
+  },
+  "footprint": {
+    "shapeType": "courtyard_centered",
+    "footprintAreaSqFt": 1056,
+    "boundingWidth": 32,
+    "boundingDepth": 44
+  },
+  "designSignature": {
+    "planningType": "courtyard_centered",
+    "circulationType": "central",
+    "privatePublicZoning": "stacked",
+    "orientationStrategy": "Orient main living areas toward E to maximize natural day-lighting and cross ventilation.",
+    "climateStrategy": [
+      "Passive stack ventilation core via courtyard and shaded monsoon roof eaves."
+    ],
+    "styleStrategy": [
+      "Sloped terracotta roof planes, sit-out verandah, and traditional timber columns."
+    ],
+    "futureAdaptability": "standard"
+  },
+  "plot": {
+    "width": 40,
+    "depth": 60,
+    "totalArea": 2400,
+    "orientation": "E",
+    "roadSide": "S",
+    "setbacks": {
+      "front": 10,
+      "rear": 6,
+      "left": 4,
+      "right": 4
+    }
+  },
+  "buildableAreaSqFt": 1408,
+  "totalBuiltUpAreaSqFt": 1803,
+  "floorsCount": 2,
+  "floors": [
+    {
+      "level": 0,
+      "name": "Ground Floor",
+      "builtUpAreaSqFt": 952
+    },
+    {
+      "level": 1,
+      "name": "First Floor",
+      "builtUpAreaSqFt": 851
+    }
+  ],
+  "stairs": [
+    {
+      "id": "stair-1",
+      "location": "Central Circulation Spine",
+      "floorLevel": 0,
+      "x": 47,
+      "y": 52,
+      "width": 10,
+      "height": 10,
+      "type": "dog_legged"
+    }
+  ],
+  "entranceDirection": "E Entrance",
+  "rooms": [
+    {
+      "id": "room-entrance",
+      "name": "Verandah (Sit-out)",
+      "category": "circulation",
+      "zoningCategory": "public",
+      "privacyLevel": "low",
+      "dimensions": "14' x 8'",
+      "areaSqFt": 115,
+      "position": {
+        "x": 28,
+        "y": 10,
+        "width": 44,
+        "height": 12,
+        "floorLevel": 0
+      },
+      "connections": [
+        "room-living"
+      ],
+      "features": [
+        "Traditional Carved Columns",
+        "Monsoon Buffer Zone"
+      ],
+      "color": "#E6E3DE"
+    },
+    {
+      "id": "room-living",
+      "name": "Formal Living Room",
+      "category": "living",
+      "zoningCategory": "public",
+      "privacyLevel": "low",
+      "dimensions": "14' x 15'",
+      "areaSqFt": 222,
+      "position": {
+        "x": 8,
+        "y": 24,
+        "width": 36,
+        "height": 38,
+        "floorLevel": 0
+      },
+      "connections": [
+        "room-entrance",
+        "room-courtyard",
+        "room-dining"
+      ],
+      "features": [
+        "Cross Ventilation North-South",
+        "High Ceiling"
+      ],
+      "color": "#F4F1EA"
+    },
+    {
+      "id": "room-courtyard",
+      "name": "Nadumuttam (Courtyard)",
+      "category": "outdoor",
+      "zoningCategory": "outdoor",
+      "privacyLevel": "medium",
+      "dimensions": "8' x 11'",
+      "areaSqFt": 88,
+      "position": {
+        "x": 47,
+        "y": 24,
+        "width": 22,
+        "height": 26,
+        "floorLevel": 0
+      },
+      "connections": [
+        "room-living",
+        "room-dining",
+        "room-master"
+      ],
+      "features": [
+        "Open-to-Sky Stack Ventilation Core",
+        "Rain Catchment Pool"
+      ],
+      "color": "#DCE5E1"
+    },
+    {
+      "id": "room-dining",
+      "name": "Family Dining Hall",
+      "category": "living",
+      "zoningCategory": "semi_private",
+      "privacyLevel": "medium",
+      "dimensions": "10' x 15'",
+      "areaSqFt": 148,
+      "position": {
+        "x": 72,
+        "y": 24,
+        "width": 22,
+        "height": 38,
+        "floorLevel": 0
+      },
+      "connections": [
+        "room-courtyard",
+        "room-kitchen"
+      ],
+      "features": [
+        "Direct Courtyard Access",
+        "Garden View"
+      ],
+      "color": "#F4F1EA"
+    },
+    {
+      "id": "room-kitchen",
+      "name": "Traditional Kitchen & Pantry",
+      "category": "kitchen",
+      "zoningCategory": "service",
+      "privacyLevel": "medium",
+      "dimensions": "11' x 11'",
+      "areaSqFt": 123,
+      "position": {
+        "x": 60,
+        "y": 64,
+        "width": 34,
+        "height": 30,
+        "floorLevel": 0
+      },
+      "connections": [
+        "room-dining"
+      ],
+      "features": [
+        "East-facing Morning Light",
+        "Exhaust Chimney Flue"
+      ],
+      "color": "#EAE6DF"
+    },
+    {
+      "id": "room-master",
+      "name": "Ground Floor Master Suite",
+      "category": "bedroom",
+      "zoningCategory": "private",
+      "privacyLevel": "high",
+      "dimensions": "16' x 11'",
+      "areaSqFt": 176,
+      "position": {
+        "x": 8,
+        "y": 64,
+        "width": 48,
+        "height": 30,
+        "floorLevel": 0
+      },
+      "connections": [
+        "room-master-bath"
+      ],
+      "features": [
+        "Private Courtyard Vista"
+      ],
+      "color": "#F7F4EF"
+    },
+    {
+      "id": "room-master-bath",
+      "name": "Master Ensuite Bath",
+      "category": "bathroom",
+      "zoningCategory": "service",
+      "privacyLevel": "high",
+      "dimensions": "8' x 10'",
+      "areaSqFt": 80,
+      "position": {
+        "x": 8,
+        "y": 82,
+        "width": 22,
+        "height": 12,
+        "floorLevel": 0
+      },
+      "connections": [
+        "room-master"
+      ],
+      "features": [
+        "Ventilated Window"
+      ],
+      "color": "#E3ECE9"
+    },
+    {
+      "id": "room-bed2",
+      "name": "Upper Bedroom Suite",
+      "category": "bedroom",
+      "zoningCategory": "private",
+      "privacyLevel": "high",
+      "dimensions": "15' x 14'",
+      "areaSqFt": 210,
+      "position": {
+        "x": 8,
+        "y": 15,
+        "width": 44,
+        "height": 35,
+        "floorLevel": 1
+      },
+      "connections": [
+        "room-bath2"
+      ],
+      "features": [
+        "Morning Sunlight Window",
+        "Built-in Closet"
+      ],
+      "color": "#F7F4EF"
+    },
+    {
+      "id": "room-lounge",
+      "name": "Upper Family Lounge / Study",
+      "category": "living",
+      "zoningCategory": "semi_private",
+      "privacyLevel": "medium",
+      "dimensions": "16' x 14'",
+      "areaSqFt": 224,
+      "position": {
+        "x": 55,
+        "y": 15,
+        "width": 38,
+        "height": 35,
+        "floorLevel": 1
+      },
+      "connections": [
+        "room-terrace"
+      ],
+      "features": [
+        "Overlooking Lower Living Void",
+        "Study Workstation"
+      ],
+      "color": "#F4F1EA"
+    },
+    {
+      "id": "room-terrace",
+      "name": "Upper Balcony Terrace",
+      "category": "outdoor",
+      "zoningCategory": "outdoor",
+      "privacyLevel": "low",
+      "dimensions": "14' x 12'",
+      "areaSqFt": 168,
+      "position": {
+        "x": 8,
+        "y": 54,
+        "width": 44,
+        "height": 32,
+        "floorLevel": 1
+      },
+      "connections": [
+        "room-lounge"
+      ],
+      "features": [
+        "Shaded Roof Eaves",
+        "Garden Overlook View"
+      ],
+      "color": "#DCE5E1"
+    },
+    {
+      "id": "room-bath2",
+      "name": "Bathroom 2",
+      "category": "bathroom",
+      "zoningCategory": "service",
+      "privacyLevel": "high",
+      "dimensions": "8' x 10'",
+      "areaSqFt": 80,
+      "position": {
+        "x": 55,
+        "y": 54,
+        "width": 38,
+        "height": 32,
+        "floorLevel": 1
+      },
+      "connections": [
+        "room-bed2"
+      ],
+      "features": [
+        "Walk-in Shower"
+      ],
+      "color": "#E3ECE9"
+    },
+    {
+      "id": "room-bed3",
+      "name": "Bedroom 3",
+      "category": "bedroom",
+      "zoningCategory": "private",
+      "privacyLevel": "high",
+      "dimensions": "13' x 13'",
+      "areaSqFt": 169,
+      "position": {
+        "x": 55,
+        "y": 68,
+        "width": 38,
+        "height": 22,
+        "floorLevel": 1
+      },
+      "connections": [],
+      "features": [
+        "Cross Ventilation Window"
+      ],
+      "color": "#F7F4EF"
+    }
+  ],
+  "walls": [],
+  "openings": [
+    {
+      "id": "op-main-door",
+      "type": "door",
+      "x": 45,
+      "y": 10,
+      "width": 6,
+      "label": "Main Entrance Door",
+      "swingDirection": "inward_left"
+    },
+    {
+      "id": "op-liv-door",
+      "type": "door",
+      "x": 28,
+      "y": 24,
+      "width": 5,
+      "label": "Living Entrance",
+      "swingDirection": "inward_left"
+    },
+    {
+      "id": "op-courtyard-slider",
+      "type": "sliding_glass",
+      "x": 47,
+      "y": 35,
+      "width": 8,
+      "label": "Courtyard Glass Slider",
+      "swingDirection": "sliding"
+    },
+    {
+      "id": "op-kit-win",
+      "type": "window",
+      "x": 94,
+      "y": 70,
+      "width": 6,
+      "label": "Kitchen Window"
+    },
+    {
+      "id": "op-master-win",
+      "type": "window",
+      "x": 8,
+      "y": 75,
+      "width": 6,
+      "label": "Master Bedroom Window"
+    }
+  ],
+  "furniture": [
+    {
+      "id": "f-sofa-1",
+      "roomId": "room-living",
+      "type": "sofa",
+      "x": 14,
+      "y": 30,
+      "width": 14,
+      "height": 8
+    },
+    {
+      "id": "f-dining-1",
+      "roomId": "room-dining",
+      "type": "dining_table",
+      "x": 76,
+      "y": 32,
+      "width": 12,
+      "height": 12
+    },
+    {
+      "id": "f-bed-1",
+      "roomId": "room-master",
+      "type": "bed",
+      "x": 14,
+      "y": 70,
+      "width": 14,
+      "height": 14
+    },
+    {
+      "id": "f-counter-1",
+      "roomId": "room-kitchen",
+      "type": "kitchen_counter",
+      "x": 64,
+      "y": 68,
+      "width": 22,
+      "height": 6
+    },
+    {
+      "id": "f-bath-1",
+      "roomId": "room-master-bath",
+      "type": "bath_fixture",
+      "x": 12,
+      "y": 84,
+      "width": 8,
+      "height": 6
+    },
+    {
+      "id": "f-bed-2",
+      "roomId": "room-bed2",
+      "type": "bed",
+      "x": 14,
+      "y": 22,
+      "width": 14,
+      "height": 14
+    }
+  ],
+  "circulationNotes": "Multi-floor circulation: central with stacked zoning.",
+  "rationale": "Architectural Engine 2.0 Design (2 Story G+1) for 40' × 60' plot (E-facing road) in Kochi. The Kerala Traditional layout derives a courtyard centered footprint strategy with 952 sq ft on Ground Floor and 851 sq ft on First Floor.",
+  "modeConsiderations": [
+    {
+      "mode": "climate_adaptive",
+      "note": "Oriented to harness prevailing winds and minimize solar heat gain."
+    }
+  ],
+  "styleFeatures": [
+    "Kerala Traditional Facade Character",
+    "Pitched Terracotta Roof Gables & Sit-out Verandah"
+  ],
+  "appearance": {
+    "wallColor": "#F4F1EA",
+    "roofColor": "#C86A4B",
+    "frameColor": "#3B2A1E",
+    "accentMaterial": "wood"
+  }
+}

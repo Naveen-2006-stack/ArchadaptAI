@@ -1,0 +1,372 @@
+{
+  "architecturalBrief": {
+    "planningIntent": "Create a Modern residential residence tailored for 4 family members in Kochi.",
+    "siteResponse": "E-facing entrance respecting 10ft front setback and 6ft rear buffer.",
+    "orientationStrategy": "Orient main living areas toward E to maximize natural day-lighting and cross ventilation.",
+    "publicPrivateStrategy": "Public formal spaces positioned near front entrance; private bedroom suites secluded toward rear/upper levels.",
+    "serviceStrategy": "Kitchen and wet utilities grouped together for efficient plumbing stacks and exhaust ventilation.",
+    "circulationStrategy": "PERIPHERAL circulation spine connecting ground-floor entrance to upper level.",
+    "climateStrategy": "Passive stack ventilation core via courtyard and shaded monsoon roof eaves.",
+    "accessibilityStrategy": "Standard single-level transition.",
+    "styleStrategy": "Double-height glazed living facade and floating canopy."
+  },
+  "spatialGraph": {
+    "nodes": [
+      {
+        "roomId": "room-entrance",
+        "name": "Entrance Foyer & Canopy",
+        "category": "circulation"
+      },
+      {
+        "roomId": "room-living",
+        "name": "Open-Plan Double-Height Living",
+        "category": "living"
+      },
+      {
+        "roomId": "room-dining",
+        "name": "Dining & Island Bar",
+        "category": "living"
+      },
+      {
+        "roomId": "room-kitchen",
+        "name": "Modern Modular Kitchen",
+        "category": "kitchen"
+      },
+      {
+        "roomId": "room-master",
+        "name": "Contemporary Master Wing",
+        "category": "bedroom"
+      },
+      {
+        "roomId": "room-master-bath",
+        "name": "Modern Spa Bathroom",
+        "category": "bathroom"
+      }
+    ],
+    "requiredAdjacencies": [
+      [
+        "room-entrance",
+        "room-living"
+      ],
+      [
+        "room-living",
+        "room-dining"
+      ],
+      [
+        "room-dining",
+        "room-kitchen"
+      ],
+      [
+        "room-master",
+        "room-master-bath"
+      ]
+    ],
+    "preferredAdjacencies": [
+      [
+        "room-living",
+        "room-terrace"
+      ]
+    ],
+    "avoidAdjacencies": [
+      [
+        "room-master",
+        "room-kitchen"
+      ]
+    ],
+    "verticalConnections": [],
+    "indoorOutdoorConnections": []
+  },
+  "footprint": {
+    "shapeType": "l_shaped",
+    "footprintAreaSqFt": 1056,
+    "boundingWidth": 32,
+    "boundingDepth": 44
+  },
+  "designSignature": {
+    "planningType": "l_shaped",
+    "circulationType": "peripheral",
+    "privatePublicZoning": "integrated",
+    "orientationStrategy": "Orient main living areas toward E to maximize natural day-lighting and cross ventilation.",
+    "climateStrategy": [
+      "Passive stack ventilation core via courtyard and shaded monsoon roof eaves."
+    ],
+    "styleStrategy": [
+      "Double-height glazed living facade and floating canopy."
+    ],
+    "futureAdaptability": "standard"
+  },
+  "plot": {
+    "width": 40,
+    "depth": 60,
+    "totalArea": 2400,
+    "orientation": "E",
+    "roadSide": "S",
+    "setbacks": {
+      "front": 10,
+      "rear": 6,
+      "left": 4,
+      "right": 4
+    }
+  },
+  "buildableAreaSqFt": 1408,
+  "totalBuiltUpAreaSqFt": 975,
+  "floorsCount": 1,
+  "floors": [
+    {
+      "level": 0,
+      "name": "Ground Floor",
+      "builtUpAreaSqFt": 975
+    }
+  ],
+  "stairs": [],
+  "entranceDirection": "E Entrance",
+  "rooms": [
+    {
+      "id": "room-entrance",
+      "name": "Entrance Foyer & Canopy",
+      "category": "circulation",
+      "zoningCategory": "public",
+      "privacyLevel": "low",
+      "dimensions": "12' x 10'",
+      "areaSqFt": 120,
+      "position": {
+        "x": 10,
+        "y": 8,
+        "width": 32,
+        "height": 14,
+        "floorLevel": 0
+      },
+      "connections": [
+        "room-living"
+      ],
+      "features": [
+        "Full-Height Glazed Entryway",
+        "Floating Canopy Roof"
+      ],
+      "color": "#E6E3DE"
+    },
+    {
+      "id": "room-living",
+      "name": "Open-Plan Double-Height Living",
+      "category": "living",
+      "zoningCategory": "public",
+      "privacyLevel": "low",
+      "dimensions": "18' x 17'",
+      "areaSqFt": 294,
+      "position": {
+        "x": 10,
+        "y": 24,
+        "width": 50,
+        "height": 40,
+        "floorLevel": 0
+      },
+      "connections": [
+        "room-entrance",
+        "room-dining"
+      ],
+      "features": [
+        "Double-Height Ceiling (18ft)",
+        "Full Glass Wall Facade"
+      ],
+      "color": "#F4F1EA"
+    },
+    {
+      "id": "room-dining",
+      "name": "Dining & Island Bar",
+      "category": "living",
+      "zoningCategory": "semi_private",
+      "privacyLevel": "medium",
+      "dimensions": "11' x 11'",
+      "areaSqFt": 123,
+      "position": {
+        "x": 62,
+        "y": 24,
+        "width": 30,
+        "height": 25,
+        "floorLevel": 0
+      },
+      "connections": [
+        "room-living",
+        "room-kitchen"
+      ],
+      "features": [
+        "Breakfast Island Bar",
+        "Garden View Terrace Access"
+      ],
+      "color": "#F4F1EA"
+    },
+    {
+      "id": "room-kitchen",
+      "name": "Modern Modular Kitchen",
+      "category": "kitchen",
+      "zoningCategory": "service",
+      "privacyLevel": "medium",
+      "dimensions": "11' x 15'",
+      "areaSqFt": 172,
+      "position": {
+        "x": 62,
+        "y": 51,
+        "width": 30,
+        "height": 41,
+        "floorLevel": 0
+      },
+      "connections": [
+        "room-dining"
+      ],
+      "features": [
+        "Concealed Appliance Wall",
+        "Utilitarian Pantry Alcove"
+      ],
+      "color": "#EAE6DF"
+    },
+    {
+      "id": "room-master",
+      "name": "Contemporary Master Wing",
+      "category": "bedroom",
+      "zoningCategory": "private",
+      "privacyLevel": "high",
+      "dimensions": "16' x 11'",
+      "areaSqFt": 176,
+      "position": {
+        "x": 10,
+        "y": 66,
+        "width": 48,
+        "height": 26,
+        "floorLevel": 0
+      },
+      "connections": [
+        "room-master-bath"
+      ],
+      "features": [
+        "Corner Floor-to-Ceiling Windows",
+        "Private Garden Terrace"
+      ],
+      "color": "#F7F4EF"
+    },
+    {
+      "id": "room-master-bath",
+      "name": "Modern Spa Bathroom",
+      "category": "bathroom",
+      "zoningCategory": "service",
+      "privacyLevel": "high",
+      "dimensions": "9' x 10'",
+      "areaSqFt": 90,
+      "position": {
+        "x": 10,
+        "y": 82,
+        "width": 22,
+        "height": 10,
+        "floorLevel": 0
+      },
+      "connections": [
+        "room-master"
+      ],
+      "features": [
+        "Rain Shower Enclosure"
+      ],
+      "color": "#E3ECE9"
+    }
+  ],
+  "walls": [],
+  "openings": [
+    {
+      "id": "op-main-door",
+      "type": "door",
+      "x": 45,
+      "y": 10,
+      "width": 6,
+      "label": "Main Entrance Door",
+      "swingDirection": "inward_left"
+    },
+    {
+      "id": "op-liv-door",
+      "type": "door",
+      "x": 28,
+      "y": 24,
+      "width": 5,
+      "label": "Living Entrance",
+      "swingDirection": "inward_left"
+    },
+    {
+      "id": "op-courtyard-slider",
+      "type": "sliding_glass",
+      "x": 47,
+      "y": 35,
+      "width": 8,
+      "label": "Courtyard Glass Slider",
+      "swingDirection": "sliding"
+    },
+    {
+      "id": "op-kit-win",
+      "type": "window",
+      "x": 94,
+      "y": 70,
+      "width": 6,
+      "label": "Kitchen Window"
+    },
+    {
+      "id": "op-master-win",
+      "type": "window",
+      "x": 8,
+      "y": 75,
+      "width": 6,
+      "label": "Master Bedroom Window"
+    }
+  ],
+  "furniture": [
+    {
+      "id": "f-sofa-1",
+      "roomId": "room-living",
+      "type": "sofa",
+      "x": 16,
+      "y": 30,
+      "width": 16,
+      "height": 8
+    },
+    {
+      "id": "f-dining-1",
+      "roomId": "room-dining",
+      "type": "dining_table",
+      "x": 66,
+      "y": 30,
+      "width": 14,
+      "height": 10
+    },
+    {
+      "id": "f-bed-1",
+      "roomId": "room-master",
+      "type": "bed",
+      "x": 16,
+      "y": 72,
+      "width": 14,
+      "height": 14
+    },
+    {
+      "id": "f-counter-1",
+      "roomId": "room-kitchen",
+      "type": "kitchen_counter",
+      "x": 66,
+      "y": 56,
+      "width": 20,
+      "height": 6
+    }
+  ],
+  "circulationNotes": "Multi-floor circulation: peripheral with integrated zoning.",
+  "rationale": "Architectural Engine 2.0 Design (1 Story G+1) for 40' × 60' plot (E-facing road) in Kochi. The Modern layout derives a l shaped footprint strategy with 975 sq ft on Ground Floor and single story.",
+  "modeConsiderations": [
+    {
+      "mode": "climate_adaptive",
+      "note": "Oriented to harness prevailing winds and minimize solar heat gain."
+    }
+  ],
+  "styleFeatures": [
+    "Modern Facade Character",
+    "Full-Height Glass Facades"
+  ],
+  "appearance": {
+    "wallColor": "#FAFAFA",
+    "roofColor": "#282623",
+    "frameColor": "#121417",
+    "accentMaterial": "wood"
+  }
+}

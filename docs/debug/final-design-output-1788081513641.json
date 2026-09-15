@@ -1,0 +1,536 @@
+{
+  "conceptNumber": 1,
+  "architecturalBrief": {
+    "planningIntent": "Design a Kerala Traditional residence organized around a central courtyard concept to satisfy 3 bedrooms and 2 bathrooms across 2 floor(s) for a 4-member household.",
+    "siteResponse": "E-facing frontage with front setback 10ft, rear setback 6ft, and protected side clearances.",
+    "orientationStrategy": "Place the main living and dining spaces toward the E edge to capture natural light and prevailing cross-ventilation.",
+    "publicPrivateStrategy": "Public living and dining functions are arranged near the entry while sleeping and bath functions remain more private toward the rear or upper level.",
+    "serviceStrategy": "Group kitchen, pantry, utility, and bath functions together near a compact wet-core to simplify plumbing and reduce structural cost.",
+    "circulationStrategy": "Use a legible central circulation spine connecting entry, living, service, and stair circulation without forcing a generic rectangular room matrix.",
+    "climateStrategy": "Use shaded verandah, courtyard air movement, eaves, and passive ventilation to make the plan climate-responsive rather than purely formal.",
+    "accessibilityStrategy": "Standard transition path is maintained for family day-to-day movement.",
+    "styleStrategy": "Kerala traditional influence is expressed in the verandah, courtyard, shaded transitions, and a strong hierarchy between public and private zones."
+  },
+  "spatialGraph": {
+    "nodes": [
+      {
+        "roomId": "room-entrance",
+        "name": "Verandah (Sit-out)",
+        "category": "circulation"
+      },
+      {
+        "roomId": "room-living",
+        "name": "Formal Living Hall",
+        "category": "living"
+      },
+      {
+        "roomId": "room-dining",
+        "name": "Family Dining Pavilion",
+        "category": "living"
+      },
+      {
+        "roomId": "room-kitchen",
+        "name": "Kitchen & Pantry",
+        "category": "kitchen"
+      },
+      {
+        "roomId": "room-courtyard",
+        "name": "Courtyard / Nadumuttam",
+        "category": "outdoor"
+      },
+      {
+        "roomId": "room-master",
+        "name": "Primary Bedroom",
+        "category": "bedroom"
+      },
+      {
+        "roomId": "room-bath-1",
+        "name": "Bath 1",
+        "category": "bathroom"
+      },
+      {
+        "roomId": "room-bed-2",
+        "name": "Bedroom 2",
+        "category": "bedroom"
+      },
+      {
+        "roomId": "room-bed-3",
+        "name": "Bedroom 3",
+        "category": "bedroom"
+      },
+      {
+        "roomId": "room-lounge",
+        "name": "Family Lounge",
+        "category": "living"
+      },
+      {
+        "roomId": "room-upper-bath-1",
+        "name": "Upper Bath 1",
+        "category": "bathroom"
+      },
+      {
+        "roomId": "room-upper-bath-2",
+        "name": "Upper Bath 2",
+        "category": "bathroom"
+      }
+    ],
+    "requiredAdjacencies": [
+      [
+        "room-entrance",
+        "room-living"
+      ],
+      [
+        "room-living",
+        "room-dining"
+      ],
+      [
+        "room-dining",
+        "room-kitchen"
+      ],
+      [
+        "room-master",
+        "room-bath-1"
+      ]
+    ],
+    "preferredAdjacencies": [
+      [
+        "room-living",
+        "room-courtyard"
+      ]
+    ],
+    "avoidAdjacencies": [
+      [
+        "room-master",
+        "room-kitchen"
+      ]
+    ],
+    "verticalConnections": [
+      {
+        "stairId": "stair-1",
+        "connectLevels": [
+          0,
+          1
+        ]
+      }
+    ],
+    "indoorOutdoorConnections": [
+      {
+        "roomId": "room-living",
+        "outdoorSpaceId": "room-courtyard"
+      }
+    ]
+  },
+  "footprint": {
+    "shapeType": "courtyard_centered",
+    "footprintAreaSqFt": 1112,
+    "boundingWidth": 32,
+    "boundingDepth": 44
+  },
+  "designSignature": {
+    "planningType": "courtyard_centered",
+    "circulationType": "central",
+    "privatePublicZoning": "stacked",
+    "conceptVariant": "A",
+    "orientationStrategy": "Place the main living and dining spaces toward the E edge to capture natural light and prevailing cross-ventilation.",
+    "climateStrategy": [
+      "Use shaded verandah, courtyard air movement, eaves, and passive ventilation to make the plan climate-responsive rather than purely formal."
+    ],
+    "styleStrategy": [
+      "Kerala traditional influence is expressed in the verandah, courtyard, shaded transitions, and a strong hierarchy between public and private zones."
+    ],
+    "futureAdaptability": "standard"
+  },
+  "plot": {
+    "width": 40,
+    "depth": 60,
+    "totalArea": 2400,
+    "orientation": "E",
+    "roadSide": "S",
+    "setbacks": {
+      "front": 10,
+      "rear": 6,
+      "left": 4,
+      "right": 4
+    }
+  },
+  "buildableAreaSqFt": 1408,
+  "totalBuiltUpAreaSqFt": 7184,
+  "floorsCount": 2,
+  "floors": [
+    {
+      "level": 0,
+      "name": "Ground Floor",
+      "builtUpAreaSqFt": 5128
+    },
+    {
+      "level": 1,
+      "name": "First Floor",
+      "builtUpAreaSqFt": 2056
+    }
+  ],
+  "stairs": [
+    {
+      "id": "stair-1",
+      "location": "Central spine",
+      "floorLevel": 0,
+      "x": 46,
+      "y": 48,
+      "width": 10,
+      "height": 12,
+      "type": "dog_legged"
+    }
+  ],
+  "entranceDirection": "E Entrance",
+  "rooms": [
+    {
+      "id": "room-entrance",
+      "name": "Verandah (Sit-out)",
+      "category": "circulation",
+      "zoningCategory": "public",
+      "privacyLevel": "low",
+      "dimensions": "42' x 12'",
+      "areaSqFt": 504,
+      "position": {
+        "x": 30,
+        "y": 8,
+        "width": 42,
+        "height": 12,
+        "floorLevel": 0
+      },
+      "connections": [
+        "room-living"
+      ],
+      "features": [
+        "Shaded sit-out",
+        "Monsoon transition"
+      ],
+      "color": "#E6E3DE"
+    },
+    {
+      "id": "room-living",
+      "name": "Formal Living Hall",
+      "category": "living",
+      "zoningCategory": "public",
+      "privacyLevel": "low",
+      "dimensions": "38' x 32'",
+      "areaSqFt": 1216,
+      "position": {
+        "x": 10,
+        "y": 22,
+        "width": 38,
+        "height": 32,
+        "floorLevel": 0
+      },
+      "connections": [
+        "room-entrance",
+        "room-dining",
+        "room-courtyard"
+      ],
+      "features": [
+        "Courtyard-facing",
+        "Daylight edge"
+      ],
+      "color": "#F4F1EA"
+    },
+    {
+      "id": "room-dining",
+      "name": "Family Dining Pavilion",
+      "category": "living",
+      "zoningCategory": "semi_private",
+      "privacyLevel": "medium",
+      "dimensions": "24' x 20'",
+      "areaSqFt": 480,
+      "position": {
+        "x": 52,
+        "y": 26,
+        "width": 24,
+        "height": 20,
+        "floorLevel": 0
+      },
+      "connections": [
+        "room-living",
+        "room-kitchen"
+      ],
+      "features": [
+        "Connected to courtyard"
+      ],
+      "color": "#F4F1EA"
+    },
+    {
+      "id": "room-kitchen",
+      "name": "Kitchen & Pantry",
+      "category": "kitchen",
+      "zoningCategory": "service",
+      "privacyLevel": "medium",
+      "dimensions": "30' x 28'",
+      "areaSqFt": 840,
+      "position": {
+        "x": 60,
+        "y": 60,
+        "width": 30,
+        "height": 28,
+        "floorLevel": 0
+      },
+      "connections": [
+        "room-dining"
+      ],
+      "features": [
+        "Service access",
+        "Utility adjacency"
+      ],
+      "color": "#EAE6DF"
+    },
+    {
+      "id": "room-courtyard",
+      "name": "Courtyard / Nadumuttam",
+      "category": "outdoor",
+      "zoningCategory": "outdoor",
+      "privacyLevel": "medium",
+      "dimensions": "28' x 24'",
+      "areaSqFt": 672,
+      "position": {
+        "x": 48,
+        "y": 58,
+        "width": 28,
+        "height": 24,
+        "floorLevel": 0
+      },
+      "connections": [
+        "room-living"
+      ],
+      "features": [
+        "Ventilation core",
+        "Lightwell"
+      ],
+      "color": "#DCE5E1"
+    },
+    {
+      "id": "room-master",
+      "name": "Primary Bedroom",
+      "category": "bedroom",
+      "zoningCategory": "private",
+      "privacyLevel": "high",
+      "dimensions": "42' x 28'",
+      "areaSqFt": 1176,
+      "position": {
+        "x": 12,
+        "y": 60,
+        "width": 42,
+        "height": 28,
+        "floorLevel": 0
+      },
+      "connections": [
+        "room-bath-1",
+        "room-bath-1",
+        "room-upper-bath-1",
+        "room-upper-bath-2"
+      ],
+      "features": [
+        "Private quiet zone"
+      ],
+      "color": "#F7F4EF"
+    },
+    {
+      "id": "room-bath-1",
+      "name": "Bath 1",
+      "category": "bathroom",
+      "zoningCategory": "service",
+      "privacyLevel": "high",
+      "dimensions": "24' x 10'",
+      "areaSqFt": 240,
+      "position": {
+        "x": 8,
+        "y": 82,
+        "width": 24,
+        "height": 10,
+        "floorLevel": 0
+      },
+      "connections": [
+        "room-master",
+        "room-master"
+      ],
+      "features": [
+        "Wet zone"
+      ],
+      "color": "#E3ECE9"
+    },
+    {
+      "id": "room-bed-2",
+      "name": "Bedroom 2",
+      "category": "bedroom",
+      "zoningCategory": "private",
+      "privacyLevel": "high",
+      "dimensions": "24' x 20'",
+      "areaSqFt": 480,
+      "position": {
+        "x": 10,
+        "y": 18,
+        "width": 24,
+        "height": 20,
+        "floorLevel": 1
+      },
+      "connections": [],
+      "features": [
+        "Private bedroom",
+        "Window daylight"
+      ],
+      "color": "#F7F4EF"
+    },
+    {
+      "id": "room-bed-3",
+      "name": "Bedroom 3",
+      "category": "bedroom",
+      "zoningCategory": "private",
+      "privacyLevel": "high",
+      "dimensions": "24' x 20'",
+      "areaSqFt": 480,
+      "position": {
+        "x": 52,
+        "y": 18,
+        "width": 24,
+        "height": 20,
+        "floorLevel": 1
+      },
+      "connections": [],
+      "features": [
+        "Private bedroom",
+        "Window daylight"
+      ],
+      "color": "#F7F4EF"
+    },
+    {
+      "id": "room-lounge",
+      "name": "Family Lounge",
+      "category": "living",
+      "zoningCategory": "semi_private",
+      "privacyLevel": "medium",
+      "dimensions": "28' x 22'",
+      "areaSqFt": 616,
+      "position": {
+        "x": 52,
+        "y": 18,
+        "width": 28,
+        "height": 22,
+        "floorLevel": 1
+      },
+      "connections": [],
+      "features": [
+        "Upper-level family zone"
+      ],
+      "color": "#F4F1EA"
+    },
+    {
+      "id": "room-upper-bath-1",
+      "name": "Upper Bath 1",
+      "category": "bathroom",
+      "zoningCategory": "service",
+      "privacyLevel": "high",
+      "dimensions": "20' x 12'",
+      "areaSqFt": 240,
+      "position": {
+        "x": 56,
+        "y": 58,
+        "width": 20,
+        "height": 12,
+        "floorLevel": 1
+      },
+      "connections": [
+        "room-master"
+      ],
+      "features": [
+        "Upper wet zone"
+      ],
+      "color": "#E3ECE9"
+    },
+    {
+      "id": "room-upper-bath-2",
+      "name": "Upper Bath 2",
+      "category": "bathroom",
+      "zoningCategory": "service",
+      "privacyLevel": "high",
+      "dimensions": "20' x 12'",
+      "areaSqFt": 240,
+      "position": {
+        "x": 12,
+        "y": 62,
+        "width": 20,
+        "height": 12,
+        "floorLevel": 1
+      },
+      "connections": [
+        "room-master"
+      ],
+      "features": [
+        "Upper wet zone"
+      ],
+      "color": "#E3ECE9"
+    }
+  ],
+  "walls": [],
+  "openings": [
+    {
+      "id": "op-main",
+      "type": "door",
+      "x": 42,
+      "y": 12,
+      "width": 6,
+      "label": "Main Entry",
+      "swingDirection": "inward_left"
+    },
+    {
+      "id": "op-courtyard",
+      "type": "sliding_glass",
+      "x": 58,
+      "y": 40,
+      "width": 8,
+      "label": "Courtyard Door",
+      "swingDirection": "sliding"
+    },
+    {
+      "id": "op-window-1",
+      "type": "window",
+      "x": 8,
+      "y": 72,
+      "width": 6,
+      "label": "Bedroom Window"
+    }
+  ],
+  "furniture": [
+    {
+      "id": "f-sofa-1",
+      "roomId": "room-living",
+      "type": "sofa",
+      "x": 18,
+      "y": 30,
+      "width": 16,
+      "height": 8
+    },
+    {
+      "id": "f-bed-1",
+      "roomId": "room-master",
+      "type": "bed",
+      "x": 18,
+      "y": 66,
+      "width": 14,
+      "height": 14
+    }
+  ],
+  "circulationNotes": "Entry -> living -> dining -> kitchen path plus private bedroom circulation on the ground and upper levels.",
+  "rationale": "Kerala Traditional concept A: a courtyard centered plan that respects the 40' × 60' site, E-facing frontage, and hard requirement set of 3 bedrooms and 2 floor(s). The design uses an architectural brief, zoning logic, and a real circulation path instead of fixed room templates.",
+  "modeConsiderations": [
+    {
+      "mode": "climate_adaptive",
+      "note": "Passive cooling and air movement drive the facade and configuration."
+    }
+  ],
+  "styleFeatures": [
+    "Kerala Traditional strategy",
+    "Verandah and courtyard-led planning"
+  ],
+  "appearance": {
+    "wallColor": "#F4F1EA",
+    "roofColor": "#C86A4B",
+    "frameColor": "#3B2A1E",
+    "accentMaterial": "wood"
+  }
+}

@@ -1,0 +1,1134 @@
+{
+  "architecturalBrief": {
+    "planningIntent": "To design a climate-adaptive, constraint-driven 3BHK residential house in the Kerala Traditional style for a family of four, adhering to a moderate budget and maximizing spatial efficiency on a compact East-facing plot.",
+    "siteResponse": "The East-facing plot in Kochi dictates a design that embraces morning sun while mitigating harsh afternoon heat. Deep verandahs, strategic window placements, and an internal lightwell/courtyard are employed to ensure comfort and natural ventilation. Parking is positioned at the front-left, providing direct access to the main entrance.",
+    "orientationStrategy": "Main public areas (Living, Verandah) are oriented towards the East for morning light and street connection. Master Bedroom is positioned on the cooler South-West. Windows are strategically placed to maximize cross-ventilation across the living-dining axis, with shaded openings on less favorable orientations.",
+    "publicPrivateStrategy": "Ground Floor hosts the public (Living, Dining), semi-private (Courtyard), and service zones (Kitchen, Utility), along with an accessible Master Suite for convenience. The First Floor is dedicated to private spaces, including two secondary bedrooms and a small study/family lounge.",
+    "serviceStrategy": "Kitchen and Utility are consolidated at the rear-left of the ground floor, adjacent to the dining area, creating a compact and efficient wet zone. The ground floor master bath is directly adjacent to the master bedroom, minimizing plumbing runs. The first-floor common bath is stacked above the kitchen/utility area for vertical plumbing efficiency.",
+    "circulationStrategy": "A clear, linear circulation spine is established from the East-facing entrance, connecting the public living spaces to the dining, kitchen, and the ground floor master bedroom. A dog-legged staircase serves as the primary vertical circulation, centrally located for easy access to all ground and first-floor areas.",
+    "climateStrategy": "Inspired by Kerala's hot-humid climate, the design incorporates a deep front verandah and a first-floor balcony for shading. An internal courtyard/lightwell introduces natural light and promotes stack effect ventilation. Pitched roofs and strategically placed fenestration facilitate cross-ventilation and heat dissipation, reducing reliance on mechanical cooling.",
+    "accessibilityStrategy": "A ground-floor master bedroom ensures accessibility for family members. The design prioritizes clear pathways and adequate room dimensions for comfortable movement within the primary living zones.",
+    "styleStrategy": "The design strongly embraces the Kerala Traditional architectural style, featuring deep shaded verandahs, pitched roofs, natural material palettes (wood, terracotta tones), and an emphasis on internal courtyards for light and ventilation. The overall massing is kept humble yet elegant, reflecting regional aesthetics."
+  },
+  "spatialGraph": {
+    "nodes": [
+      {
+        "roomId": "room-parking",
+        "name": "Car Parking",
+        "category": "outdoor",
+        "zoningCategory": "service",
+        "privacyLevel": "low"
+      },
+      {
+        "roomId": "room-verandah",
+        "name": "Verandah",
+        "category": "outdoor",
+        "zoningCategory": "public",
+        "privacyLevel": "low"
+      },
+      {
+        "roomId": "room-entrance",
+        "name": "Foyer",
+        "category": "circulation",
+        "zoningCategory": "public",
+        "privacyLevel": "low"
+      },
+      {
+        "roomId": "room-living",
+        "name": "Formal Living",
+        "category": "living",
+        "zoningCategory": "public",
+        "privacyLevel": "low"
+      },
+      {
+        "roomId": "room-dining",
+        "name": "Dining",
+        "category": "living",
+        "zoningCategory": "semi_private",
+        "privacyLevel": "medium"
+      },
+      {
+        "roomId": "room-kitchen",
+        "name": "Kitchen",
+        "category": "kitchen",
+        "zoningCategory": "service",
+        "privacyLevel": "medium"
+      },
+      {
+        "roomId": "room-utility",
+        "name": "Utility",
+        "category": "utility",
+        "zoningCategory": "service",
+        "privacyLevel": "medium"
+      },
+      {
+        "roomId": "room-master-0",
+        "name": "Master Bedroom G.F.",
+        "category": "bedroom",
+        "zoningCategory": "private",
+        "privacyLevel": "high"
+      },
+      {
+        "roomId": "room-master-bath-0",
+        "name": "Master Bath G.F.",
+        "category": "bathroom",
+        "zoningCategory": "service",
+        "privacyLevel": "high"
+      },
+      {
+        "roomId": "stair-1",
+        "name": "Staircase",
+        "category": "circulation",
+        "zoningCategory": "circulation",
+        "privacyLevel": "medium"
+      },
+      {
+        "roomId": "room-courtyard",
+        "name": "Internal Courtyard",
+        "category": "outdoor",
+        "zoningCategory": "semi_private",
+        "privacyLevel": "medium"
+      },
+      {
+        "roomId": "room-study-1",
+        "name": "Study Lounge F.F.",
+        "category": "living",
+        "zoningCategory": "semi_private",
+        "privacyLevel": "medium"
+      },
+      {
+        "roomId": "room-bedroom-1",
+        "name": "Bedroom 1 F.F.",
+        "category": "bedroom",
+        "zoningCategory": "private",
+        "privacyLevel": "high"
+      },
+      {
+        "roomId": "room-bedroom-2",
+        "name": "Bedroom 2 F.F.",
+        "category": "bedroom",
+        "zoningCategory": "private",
+        "privacyLevel": "high"
+      },
+      {
+        "roomId": "room-bath-1",
+        "name": "Common Bath F.F.",
+        "category": "bathroom",
+        "zoningCategory": "service",
+        "privacyLevel": "high"
+      },
+      {
+        "roomId": "room-storage-1",
+        "name": "Storage F.F.",
+        "category": "utility",
+        "zoningCategory": "service",
+        "privacyLevel": "medium"
+      },
+      {
+        "roomId": "room-balcony-1",
+        "name": "Balcony F.F.",
+        "category": "outdoor",
+        "zoningCategory": "private",
+        "privacyLevel": "medium"
+      }
+    ],
+    "requiredAdjacencies": [
+      [
+        "room-parking",
+        "room-entrance"
+      ],
+      [
+        "room-verandah",
+        "room-entrance"
+      ],
+      [
+        "room-entrance",
+        "room-living"
+      ],
+      [
+        "room-living",
+        "room-dining"
+      ],
+      [
+        "room-dining",
+        "room-kitchen"
+      ],
+      [
+        "room-kitchen",
+        "room-utility"
+      ],
+      [
+        "room-master-0",
+        "room-master-bath-0"
+      ],
+      [
+        "room-dining",
+        "stair-1"
+      ],
+      [
+        "stair-1",
+        "room-study-1"
+      ],
+      [
+        "room-bedroom-1",
+        "room-study-1"
+      ],
+      [
+        "room-bedroom-2",
+        "room-study-1"
+      ],
+      [
+        "room-bedroom-1",
+        "room-bath-1"
+      ],
+      [
+        "room-bedroom-2",
+        "room-bath-1"
+      ]
+    ],
+    "preferredAdjacencies": [
+      [
+        "room-living",
+        "room-courtyard"
+      ],
+      [
+        "room-dining",
+        "room-courtyard"
+      ],
+      [
+        "room-bedroom-1",
+        "room-balcony-1"
+      ],
+      [
+        "room-utility",
+        "room-courtyard"
+      ]
+    ],
+    "avoidAdjacencies": [
+      [
+        "room-master-0",
+        "room-kitchen"
+      ]
+    ],
+    "verticalConnections": [
+      {
+        "stairId": "stair-1",
+        "connectLevels": [
+          0,
+          1
+        ]
+      }
+    ],
+    "indoorOutdoorConnections": [
+      {
+        "roomId": "room-verandah",
+        "outdoorSpaceId": "room-entrance"
+      },
+      {
+        "roomId": "room-living",
+        "outdoorSpaceId": "room-courtyard"
+      },
+      {
+        "roomId": "room-dining",
+        "outdoorSpaceId": "room-courtyard"
+      },
+      {
+        "roomId": "room-bedroom-1",
+        "outdoorSpaceId": "room-balcony-1"
+      }
+    ]
+  },
+  "footprint": {
+    "shapeType": "l_shaped",
+    "footprintAreaSqFt": 1110,
+    "boundingWidth": 28,
+    "boundingDepth": 47
+  },
+  "designSignature": {
+    "planningType": "l_shaped",
+    "circulationType": "peripheral",
+    "privatePublicZoning": "stacked",
+    "orientationStrategy": "East-facing for public zones, South-West for private zones, cross-ventilation focus.",
+    "climateStrategy": [
+      "deep_verandahs_balconies_for_shading",
+      "internal_courtyard_for_light_ventilation",
+      "cross_ventilation_maximization",
+      "pitched_roof_for_heat_dissipation"
+    ],
+    "styleStrategy": [
+      "kerala_traditional_elements",
+      "natural_materials",
+      "pitched_roof_with_tiles"
+    ],
+    "futureAdaptability": "standard"
+  },
+  "plot": {
+    "width": 40,
+    "depth": 60,
+    "totalArea": 2400,
+    "orientation": "E",
+    "roadSide": "E",
+    "setbacks": {
+      "front": 8,
+      "rear": 5,
+      "left": 4,
+      "right": 4
+    }
+  },
+  "buildableAreaSqFt": 1504,
+  "totalBuiltUpAreaSqFt": 1890,
+  "floorsCount": 2,
+  "floors": [
+    {
+      "level": 0,
+      "name": "Ground Floor",
+      "builtUpAreaSqFt": 1110
+    },
+    {
+      "level": 1,
+      "name": "First Floor",
+      "builtUpAreaSqFt": 780
+    }
+  ],
+  "stairs": [
+    {
+      "id": "stair-1",
+      "location": "Adjacent to Dining/Master Bedroom",
+      "floorLevel": 0,
+      "x": 4,
+      "y": 18,
+      "width": 10,
+      "height": 8,
+      "type": "dog_legged"
+    }
+  ],
+  "entranceDirection": "E Entrance",
+  "rooms": [
+    {
+      "id": "room-parking",
+      "name": "Car Parking",
+      "category": "outdoor",
+      "zoningCategory": "service",
+      "privacyLevel": "low",
+      "dimensions": "10' x 18'",
+      "areaSqFt": 180,
+      "position": {
+        "x": 4,
+        "y": 0,
+        "width": 10,
+        "height": 18,
+        "floorLevel": 0
+      },
+      "connections": [],
+      "features": [
+        "covered"
+      ],
+      "color": "#D3D3D3"
+    },
+    {
+      "id": "room-verandah",
+      "name": "Verandah",
+      "category": "outdoor",
+      "zoningCategory": "public",
+      "privacyLevel": "low",
+      "dimensions": "18' x 6'",
+      "areaSqFt": 108,
+      "position": {
+        "x": 14,
+        "y": 8,
+        "width": 18,
+        "height": 6,
+        "floorLevel": 0
+      },
+      "connections": [
+        "room-entrance"
+      ],
+      "features": [
+        "deeply_shaded"
+      ],
+      "color": "#BDB76B"
+    },
+    {
+      "id": "room-entrance",
+      "name": "Foyer",
+      "category": "circulation",
+      "zoningCategory": "public",
+      "privacyLevel": "low",
+      "dimensions": "8' x 6'",
+      "areaSqFt": 48,
+      "position": {
+        "x": 24,
+        "y": 14,
+        "width": 8,
+        "height": 6,
+        "floorLevel": 0
+      },
+      "connections": [
+        "room-verandah",
+        "room-living"
+      ],
+      "features": [
+        "main_entry"
+      ],
+      "color": "#FFFDD0"
+    },
+    {
+      "id": "room-living",
+      "name": "Formal Living",
+      "category": "living",
+      "zoningCategory": "public",
+      "privacyLevel": "low",
+      "dimensions": "18' x 18'",
+      "areaSqFt": 324,
+      "position": {
+        "x": 14,
+        "y": 20,
+        "width": 18,
+        "height": 18,
+        "floorLevel": 0
+      },
+      "connections": [
+        "room-entrance",
+        "room-dining",
+        "room-courtyard",
+        "stair-1"
+      ],
+      "features": [
+        "east_facing_windows",
+        "ample_natural_light"
+      ],
+      "color": "#E0FFFF"
+    },
+    {
+      "id": "room-dining",
+      "name": "Dining",
+      "category": "living",
+      "zoningCategory": "semi_private",
+      "privacyLevel": "medium",
+      "dimensions": "18' x 12'",
+      "areaSqFt": 216,
+      "position": {
+        "x": 14,
+        "y": 38,
+        "width": 18,
+        "height": 12,
+        "floorLevel": 0
+      },
+      "connections": [
+        "room-living",
+        "room-kitchen",
+        "room-courtyard",
+        "stair-1"
+      ],
+      "features": [
+        "open_plan_concept",
+        "view_to_courtyard"
+      ],
+      "color": "#F0FFF0"
+    },
+    {
+      "id": "room-kitchen",
+      "name": "Kitchen",
+      "category": "kitchen",
+      "zoningCategory": "service",
+      "privacyLevel": "medium",
+      "dimensions": "10' x 10'",
+      "areaSqFt": 100,
+      "position": {
+        "x": 4,
+        "y": 40,
+        "width": 10,
+        "height": 10,
+        "floorLevel": 0
+      },
+      "connections": [
+        "room-dining",
+        "room-utility"
+      ],
+      "features": [
+        "efficient_layout",
+        "consolidated_wet_zone"
+      ],
+      "color": "#FFFACD"
+    },
+    {
+      "id": "room-utility",
+      "name": "Utility",
+      "category": "utility",
+      "zoningCategory": "service",
+      "privacyLevel": "medium",
+      "dimensions": "6' x 5'",
+      "areaSqFt": 30,
+      "position": {
+        "x": 4,
+        "y": 50,
+        "width": 6,
+        "height": 5,
+        "floorLevel": 0
+      },
+      "connections": [
+        "room-kitchen"
+      ],
+      "features": [
+        "laundry_connection",
+        "storage_space"
+      ],
+      "color": "#F5DEB3"
+    },
+    {
+      "id": "room-master-0",
+      "name": "Master Bedroom G.F.",
+      "category": "bedroom",
+      "zoningCategory": "private",
+      "privacyLevel": "high",
+      "dimensions": "10' x 14'",
+      "areaSqFt": 140,
+      "position": {
+        "x": 4,
+        "y": 26,
+        "width": 10,
+        "height": 14,
+        "floorLevel": 0
+      },
+      "connections": [
+        "room-master-bath-0",
+        "stair-1"
+      ],
+      "features": [
+        "ground_floor_accessibility",
+        "quiet_zone"
+      ],
+      "color": "#ADD8E6"
+    },
+    {
+      "id": "room-master-bath-0",
+      "name": "Master Bath G.F.",
+      "category": "bathroom",
+      "zoningCategory": "service",
+      "privacyLevel": "high",
+      "dimensions": "4' x 6'",
+      "areaSqFt": 24,
+      "position": {
+        "x": 10,
+        "y": 40,
+        "width": 4,
+        "height": 6,
+        "floorLevel": 0
+      },
+      "connections": [
+        "room-master-0"
+      ],
+      "features": [
+        "ensuite_bathroom"
+      ],
+      "color": "#B0E0E6"
+    },
+    {
+      "id": "room-courtyard",
+      "name": "Internal Courtyard",
+      "category": "outdoor",
+      "zoningCategory": "semi_private",
+      "privacyLevel": "medium",
+      "dimensions": "8' x 5'",
+      "areaSqFt": 40,
+      "position": {
+        "x": 24,
+        "y": 50,
+        "width": 8,
+        "height": 5,
+        "floorLevel": 0
+      },
+      "connections": [
+        "room-living",
+        "room-dining"
+      ],
+      "features": [
+        "light_well",
+        "ventilation_stack",
+        "small_garden_bed"
+      ],
+      "color": "#98FB98"
+    },
+    {
+      "id": "room-study-1",
+      "name": "Study Lounge F.F.",
+      "category": "living",
+      "zoningCategory": "semi_private",
+      "privacyLevel": "medium",
+      "dimensions": "10' x 8'",
+      "areaSqFt": 80,
+      "position": {
+        "x": 4,
+        "y": 18,
+        "width": 10,
+        "height": 8,
+        "floorLevel": 1
+      },
+      "connections": [
+        "stair-1",
+        "room-bedroom-1",
+        "room-bedroom-2",
+        "room-bath-1"
+      ],
+      "features": [
+        "multi_functional_space",
+        "natural_light_from_below"
+      ],
+      "color": "#FFE4B5"
+    },
+    {
+      "id": "room-bedroom-1",
+      "name": "Bedroom 1 F.F.",
+      "category": "bedroom",
+      "zoningCategory": "private",
+      "privacyLevel": "high",
+      "dimensions": "18' x 18'",
+      "areaSqFt": 324,
+      "position": {
+        "x": 14,
+        "y": 20,
+        "width": 18,
+        "height": 18,
+        "floorLevel": 1
+      },
+      "connections": [
+        "room-study-1",
+        "room-balcony-1"
+      ],
+      "features": [
+        "spacious",
+        "east_facing_views"
+      ],
+      "color": "#B0E0E6"
+    },
+    {
+      "id": "room-bedroom-2",
+      "name": "Bedroom 2 F.F.",
+      "category": "bedroom",
+      "zoningCategory": "private",
+      "privacyLevel": "high",
+      "dimensions": "18' x 12'",
+      "areaSqFt": 216,
+      "position": {
+        "x": 14,
+        "y": 38,
+        "width": 18,
+        "height": 12,
+        "floorLevel": 1
+      },
+      "connections": [
+        "room-study-1"
+      ],
+      "features": [
+        "rear_facing",
+        "quiet_ambiance"
+      ],
+      "color": "#ADD8E6"
+    },
+    {
+      "id": "room-bath-1",
+      "name": "Common Bath F.F.",
+      "category": "bathroom",
+      "zoningCategory": "service",
+      "privacyLevel": "high",
+      "dimensions": "6' x 10'",
+      "areaSqFt": 60,
+      "position": {
+        "x": 4,
+        "y": 40,
+        "width": 6,
+        "height": 10,
+        "floorLevel": 1
+      },
+      "connections": [
+        "room-study-1",
+        "room-bedroom-1",
+        "room-bedroom-2"
+      ],
+      "features": [
+        "shared_bathroom"
+      ],
+      "color": "#AFEEEE"
+    },
+    {
+      "id": "room-storage-1",
+      "name": "Storage F.F.",
+      "category": "utility",
+      "zoningCategory": "service",
+      "privacyLevel": "medium",
+      "dimensions": "4' x 10'",
+      "areaSqFt": 40,
+      "position": {
+        "x": 10,
+        "y": 40,
+        "width": 4,
+        "height": 10,
+        "floorLevel": 1
+      },
+      "connections": [
+        "room-study-1"
+      ],
+      "features": [
+        "linen_storage",
+        "misc_storage"
+      ],
+      "color": "#FAEBD7"
+    },
+    {
+      "id": "room-balcony-1",
+      "name": "Balcony F.F.",
+      "category": "outdoor",
+      "zoningCategory": "private",
+      "privacyLevel": "medium",
+      "dimensions": "10' x 6'",
+      "areaSqFt": 60,
+      "position": {
+        "x": 14,
+        "y": 8,
+        "width": 10,
+        "height": 6,
+        "floorLevel": 1
+      },
+      "connections": [
+        "room-bedroom-1"
+      ],
+      "features": [
+        "shaded_outdoor_space",
+        "street_view"
+      ],
+      "color": "#DDA0DD"
+    }
+  ],
+  "walls": [],
+  "openings": [
+    {
+      "id": "op-main",
+      "type": "door",
+      "x": 26,
+      "y": 14,
+      "width": 4,
+      "label": "Main Entrance Door",
+      "swingDirection": "inward_left",
+      "floorLevel": 0
+    },
+    {
+      "id": "op-liv-din",
+      "type": "opening",
+      "x": 22,
+      "y": 38,
+      "width": 8,
+      "label": "Living-Dining Archway",
+      "swingDirection": "none",
+      "floorLevel": 0
+    },
+    {
+      "id": "op-din-kit",
+      "type": "door",
+      "x": 14,
+      "y": 43,
+      "width": 3,
+      "label": "Dining-Kitchen Door",
+      "swingDirection": "outward_right",
+      "floorLevel": 0
+    },
+    {
+      "id": "op-kit-util",
+      "type": "door",
+      "x": 10,
+      "y": 51,
+      "width": 3,
+      "label": "Kitchen-Utility Door",
+      "swingDirection": "inward_left",
+      "floorLevel": 0
+    },
+    {
+      "id": "op-master-bed-door",
+      "type": "door",
+      "x": 14,
+      "y": 30,
+      "width": 3,
+      "label": "Master Bedroom Door",
+      "swingDirection": "inward_left",
+      "floorLevel": 0
+    },
+    {
+      "id": "op-master-bath-door",
+      "type": "door",
+      "x": 10,
+      "y": 40,
+      "width": 2.5,
+      "label": "Master Bath Door",
+      "swingDirection": "inward_left",
+      "floorLevel": 0
+    },
+    {
+      "id": "op-courtyard-access",
+      "type": "door",
+      "x": 24,
+      "y": 50,
+      "width": 3,
+      "label": "Courtyard Access",
+      "swingDirection": "outward_left",
+      "floorLevel": 0
+    },
+    {
+      "id": "op-bed1-door",
+      "type": "door",
+      "x": 14,
+      "y": 28,
+      "width": 3,
+      "label": "Bedroom 1 Door",
+      "swingDirection": "inward_left",
+      "floorLevel": 1
+    },
+    {
+      "id": "op-bed2-door",
+      "type": "door",
+      "x": 14,
+      "y": 42,
+      "width": 3,
+      "label": "Bedroom 2 Door",
+      "swingDirection": "inward_left",
+      "floorLevel": 1
+    },
+    {
+      "id": "op-bath1-door",
+      "type": "door",
+      "x": 10,
+      "y": 44,
+      "width": 2.5,
+      "label": "Common Bath Door",
+      "swingDirection": "inward_left",
+      "floorLevel": 1
+    },
+    {
+      "id": "op-storage1-door",
+      "type": "door",
+      "x": 14,
+      "y": 44,
+      "width": 2.5,
+      "label": "Storage Door",
+      "swingDirection": "inward_left",
+      "floorLevel": 1
+    },
+    {
+      "id": "op-balcony-door",
+      "type": "door",
+      "x": 20,
+      "y": 14,
+      "width": 4,
+      "label": "Balcony Door",
+      "swingDirection": "outward_right",
+      "floorLevel": 1
+    },
+    {
+      "id": "win-liv-e1",
+      "type": "window",
+      "x": 22,
+      "y": 20,
+      "width": 8,
+      "label": "Living East Window",
+      "swingDirection": "none",
+      "floorLevel": 0
+    },
+    {
+      "id": "win-liv-n1",
+      "type": "window",
+      "x": 14,
+      "y": 26,
+      "width": 4,
+      "label": "Living North Window",
+      "swingDirection": "none",
+      "floorLevel": 0
+    },
+    {
+      "id": "win-din-n1",
+      "type": "window",
+      "x": 14,
+      "y": 42,
+      "width": 4,
+      "label": "Dining North Window",
+      "swingDirection": "none",
+      "floorLevel": 0
+    },
+    {
+      "id": "win-kit-w1",
+      "type": "window",
+      "x": 4,
+      "y": 45,
+      "width": 4,
+      "label": "Kitchen West Window",
+      "swingDirection": "none",
+      "floorLevel": 0
+    },
+    {
+      "id": "win-util-w1",
+      "type": "window",
+      "x": 4,
+      "y": 52,
+      "width": 3,
+      "label": "Utility West Window",
+      "swingDirection": "none",
+      "floorLevel": 0
+    },
+    {
+      "id": "win-master-s1",
+      "type": "window",
+      "x": 10,
+      "y": 26,
+      "width": 4,
+      "label": "Master South Window",
+      "swingDirection": "none",
+      "floorLevel": 0
+    },
+    {
+      "id": "win-master-w1",
+      "type": "window",
+      "x": 4,
+      "y": 30,
+      "width": 4,
+      "label": "Master West Window",
+      "swingDirection": "none",
+      "floorLevel": 0
+    },
+    {
+      "id": "win-master-bath-w1",
+      "type": "window",
+      "x": 10,
+      "y": 43,
+      "width": 2.5,
+      "label": "Master Bath West Window",
+      "swingDirection": "none",
+      "floorLevel": 0
+    },
+    {
+      "id": "win-bed1-e1",
+      "type": "window",
+      "x": 22,
+      "y": 20,
+      "width": 8,
+      "label": "Bedroom 1 East Window",
+      "swingDirection": "none",
+      "floorLevel": 1
+    },
+    {
+      "id": "win-bed1-n1",
+      "type": "window",
+      "x": 14,
+      "y": 26,
+      "width": 4,
+      "label": "Bedroom 1 North Window",
+      "swingDirection": "none",
+      "floorLevel": 1
+    },
+    {
+      "id": "win-bed2-n1",
+      "type": "window",
+      "x": 14,
+      "y": 42,
+      "width": 4,
+      "label": "Bedroom 2 North Window",
+      "swingDirection": "none",
+      "floorLevel": 1
+    },
+    {
+      "id": "win-bath1-w1",
+      "type": "window",
+      "x": 4,
+      "y": 45,
+      "width": 4,
+      "label": "Common Bath West Window",
+      "swingDirection": "none",
+      "floorLevel": 1
+    },
+    {
+      "id": "win-study-w1",
+      "type": "window",
+      "x": 4,
+      "y": 22,
+      "width": 4,
+      "label": "Study West Window",
+      "swingDirection": "none",
+      "floorLevel": 1
+    }
+  ],
+  "furniture": [
+    {
+      "id": "f-sofa-1",
+      "roomId": "room-living",
+      "type": "sofa",
+      "x": 16,
+      "y": 24,
+      "width": 10,
+      "height": 4,
+      "floorLevel": 0
+    },
+    {
+      "id": "f-sofa-2",
+      "roomId": "room-living",
+      "type": "sofa",
+      "x": 25,
+      "y": 25,
+      "width": 4,
+      "height": 8,
+      "floorLevel": 0
+    },
+    {
+      "id": "f-dining-table",
+      "roomId": "room-dining",
+      "type": "dining_table",
+      "x": 20,
+      "y": 42,
+      "width": 10,
+      "height": 5,
+      "floorLevel": 0
+    },
+    {
+      "id": "f-kitchen-counter-1",
+      "roomId": "room-kitchen",
+      "type": "kitchen_counter",
+      "x": 4,
+      "y": 40,
+      "width": 8,
+      "height": 2,
+      "floorLevel": 0
+    },
+    {
+      "id": "f-kitchen-counter-2",
+      "roomId": "room-kitchen",
+      "type": "kitchen_counter",
+      "x": 4,
+      "y": 48,
+      "width": 8,
+      "height": 2,
+      "floorLevel": 0
+    },
+    {
+      "id": "f-bed-master",
+      "roomId": "room-master-0",
+      "type": "bed",
+      "x": 6,
+      "y": 30,
+      "width": 6,
+      "height": 7,
+      "floorLevel": 0
+    },
+    {
+      "id": "f-wc-master",
+      "roomId": "room-master-bath-0",
+      "type": "bath_fixture",
+      "x": 11,
+      "y": 41,
+      "width": 2,
+      "height": 1,
+      "label": "WC",
+      "floorLevel": 0
+    },
+    {
+      "id": "f-basin-master",
+      "roomId": "room-master-bath-0",
+      "type": "bath_fixture",
+      "x": 12,
+      "y": 44,
+      "width": 2,
+      "height": 1.5,
+      "label": "Basin",
+      "floorLevel": 0
+    },
+    {
+      "id": "f-shower-master",
+      "roomId": "room-master-bath-0",
+      "type": "bath_fixture",
+      "x": 10.5,
+      "y": 45,
+      "width": 2.5,
+      "height": 1,
+      "label": "Shower",
+      "floorLevel": 0
+    },
+    {
+      "id": "f-desk-study",
+      "roomId": "room-study-1",
+      "type": "desk",
+      "x": 5,
+      "y": 20,
+      "width": 6,
+      "height": 3,
+      "floorLevel": 1
+    },
+    {
+      "id": "f-bed-b1",
+      "roomId": "room-bedroom-1",
+      "type": "bed",
+      "x": 20,
+      "y": 24,
+      "width": 7,
+      "height": 6,
+      "floorLevel": 1
+    },
+    {
+      "id": "f-bed-b2",
+      "roomId": "room-bedroom-2",
+      "type": "bed",
+      "x": 20,
+      "y": 42,
+      "width": 7,
+      "height": 6,
+      "floorLevel": 1
+    },
+    {
+      "id": "f-wc-common",
+      "roomId": "room-bath-1",
+      "type": "bath_fixture",
+      "x": 5,
+      "y": 41,
+      "width": 2,
+      "height": 1,
+      "label": "WC",
+      "floorLevel": 1
+    },
+    {
+      "id": "f-basin-common",
+      "roomId": "room-bath-1",
+      "type": "bath_fixture",
+      "x": 7,
+      "y": 44,
+      "width": 2,
+      "height": 1.5,
+      "label": "Basin",
+      "floorLevel": 1
+    },
+    {
+      "id": "f-shower-common",
+      "roomId": "room-bath-1",
+      "type": "bath_fixture",
+      "x": 5.5,
+      "y": 45,
+      "width": 2.5,
+      "height": 1,
+      "label": "Shower",
+      "floorLevel": 1
+    }
+  ],
+  "circulationNotes": "Ground floor circulation is designed as an efficient 'L-shaped' path, guiding residents from the entrance through public and semi-private zones, with minimal dead ends. The centrally located dog-legged staircase ensures smooth vertical flow to the private upper floor, where a small lounge acts as a central distribution point for bedrooms and bathroom.",
+  "rationale": "The design for this 3BHK residence on a 40x60ft East-facing plot in Kochi is meticulously crafted to blend the family's needs with critical site and climate constraints, all within a moderate budget of approximately ₹40 lakh. \n\n**Zoning & Adjacencies:** The ground floor (Level 0) prioritizes public and semi-private functions with an L-shaped layout. The Verandah and Foyer serve as a welcoming public entry point, directly leading into the expansive Formal Living room (18'x18'). This space then seamlessly connects to the Dining area (18'x12'), fostering an open-plan living experience. The Kitchen (10'x10') and Utility (6'x5') are strategically placed adjacent to the Dining, forming a consolidated service core to optimize plumbing and reduce costs. A key climate-adaptive feature is the integrated Internal Courtyard (8'x5') at the rear of the dining, acting as a lightwell and natural ventilation shaft, visible from both living and dining areas. The Master Bedroom (10'x14') with its ensuite bath (4'x6') is located on the ground floor, offering privacy and accessibility. The staircase is discreetly tucked away between the master bedroom and the kitchen, leading to the upper private zone. \n\n**Multi-Floor Spatial Planning:** The first floor (Level 1) is entirely dedicated to private living. It houses two additional Bedrooms (Bedroom 1: 18'x18', Bedroom 2: 18'x12'), both of ample size. A functional Study Lounge (10'x8') serves as a flexible family area or workspace, accessible directly from the staircase landing. A Common Bathroom (6'x10') and Storage (4'x10') are efficiently located above the ground floor's wet zones to maintain plumbing efficiency. Bedroom 1 benefits from a Balcony (10'x6') overlooking the front, providing an outdoor retreat and shading the verandah below.\n\n**Budget & Efficiency:** The L-shaped footprint is chosen for its efficiency, minimizing redundant circulation while maximizing usable built-up area within the setback constraints. Consolidating wet areas (kitchen, utility, bathrooms) vertically and horizontally significantly reduces plumbing costs. The total built-up area of approximately 1890 sqft is carefully balanced to meet the program requirements within the stated budget tier. \n\n**Climate Adaptation & Style:** Embracing Kerala Traditional architectural principles, the design incorporates a deep Verandah and Balcony on the East facade to shield against harsh sun, especially important given the Kochi climate. Large windows on the East and North sides maximize natural light and cross-ventilation, while the internal courtyard (mimicking a 'Nadumuttam' lightwell) promotes stack effect ventilation. The use of traditional material cues (e.g., pitched roof, implied wooden accents) reinforces the aesthetic identity. This comprehensive approach ensures a comfortable, functional, and aesthetically appropriate home for the family.",
+  "modeConsiderations": [
+    {
+      "mode": "climate_adaptive",
+      "note": "Design features such as deep verandahs, an internal lightwell/courtyard, and strategic window placements (larger on East/North, shaded on West/South) are integral to promoting natural light and cross-ventilation, crucial for Kochi's hot and humid climate. The pitched roof further aids in heat dissipation."
+    }
+  ],
+  "styleFeatures": [
+    "deep_verandah",
+    "pitched_roof",
+    "internal_courtyard_lightwell",
+    "natural_material_palette",
+    "emphasis_on_ventilation"
+  ],
+  "appearance": {
+    "wallColor": "#F4F1EA",
+    "roofColor": "#C86A4B",
+    "frameColor": "#121417",
+    "accentMaterial": "wood"
+  }
+}
