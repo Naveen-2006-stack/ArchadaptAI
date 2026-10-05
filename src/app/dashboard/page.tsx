@@ -11,89 +11,63 @@ import { getUserProjectsFromSupabase, deleteProjectFromSupabase } from '@/lib/se
 export default function DashboardPage() {
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
+  const [signedIn, setSignedIn] = useState(false);
+  const [loadError, setLoadError] = useState<string | null>(null);
 
   useEffect(() => {
+    let cancelled = false;
+
     async function loadUserProjects() {
       setLoading(true);
-      const { data: { user } } = await supabase.auth.getUser();
+      setLoadError(null);
+      const loaded: Project[] = [];
 
-      if (user) {
-        // Query Supabase for real persistent user projects
-        const dbProjects = await getUserProjectsFromSupabase(user.id);
-        if (dbProjects && dbProjects.length > 0) {
-          setProjects(dbProjects);
-          setLoading(false);
-          return;
+      // Projects saved to the signed-in user's account.
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          if (!cancelled) setSignedIn(true);
+          const dbProjects = await getUserProjectsFromSupabase(user.id);
+          loaded.push(...dbProjects.map((project) => ({ ...project, storage: 'supabase' as const })));
         }
+      } catch {
+        if (!cancelled) setLoadError('Your account projects could not be loaded. Projects stored in this browser are shown below.');
       }
 
-      // Fallback: Check local storage for offline / guest creations
-      const keys = Object.keys(localStorage).filter(k => k.startsWith('project_'));
-      const localLoaded: Project[] = [];
-      keys.forEach(k => {
-        try {
-          const item = JSON.parse(localStorage.getItem(k) || '');
-          if (item && item.id) localLoaded.push(item);
-        } catch {}
-      });
+      // Projects created without signing in live in this browser.
+      try {
+        Object.keys(localStorage).filter((key) => key.startsWith('project_')).forEach((key) => {
+          try {
+            const item = JSON.parse(localStorage.getItem(key) || '');
+            if (item?.id && Array.isArray(item.versions) && !loaded.some((project) => project.id === item.id)) loaded.push({ ...item, storage: 'local' });
+          } catch { /* skip unreadable entries */ }
+        });
+      } catch { /* localStorage unavailable */ }
 
-      if (localLoaded.length > 0) {
-        setProjects(localLoaded);
-      } else {
-        // Demo project if no projects exist yet
-        setProjects([
-          {
-            id: 'demo-proj-1',
-            userId: user?.id || 'demo-user',
-            title: 'Kerala Modern Tropical Residence',
-            location: { name: 'Kochi Plot', city: 'Kochi', country: 'India', lat: 9.93, lng: 76.26 },
-            siteInfo: { plotWidth: 40, plotDepth: 60, totalArea: 2400, orientation: 'E' },
-            requirements: {
-              familySize: 4, bedrooms: 3, bathrooms: 2, floors: 2, budgetRange: 'Moderate',
-              spaces: { living: true, dining: true, kitchen: true, parkingCars: 1, balcony: true, studyWorkspace: true, storage: true, prayerRoom: false, courtyard: true, guestRoom: false, outdoorGarden: true }
-            },
-            preferences: { modes: ['climate_adaptive', 'life_stage'], primaryStyle: 'Kerala Traditional' },
-            currentVersionId: 'v1',
-            versions: [
-              {
-                id: 'v1',
-                projectId: 'demo-proj-1',
-                versionNumber: 1,
-                title: 'Initial Concept',
-                structuredDesign: {
-                  plot: { width: 40, depth: 60, totalArea: 2400, orientation: 'E', roadSide: 'N' },
-                  totalBuiltUpAreaSqFt: 1850,
-                  floorsCount: 2,
-                  entranceDirection: 'East Entrance',
-                  rooms: [
-                    { id: 'r1', name: 'Verandah (Sit-out)', category: 'circulation', dimensions: "12' x 8'", areaSqFt: 96, position: { x: 35, y: 5, width: 30, height: 12, floorLevel: 0 }, connections: [], features: [] },
-                    { id: 'r2', name: 'Living Room', category: 'living', dimensions: "18' x 16'", areaSqFt: 288, position: { x: 10, y: 18, width: 42, height: 28, floorLevel: 0 }, connections: [], features: [] },
-                    { id: 'r3', name: 'Nadumuttam Courtyard', category: 'outdoor', dimensions: "10' x 10'", areaSqFt: 100, position: { x: 53, y: 18, width: 22, height: 28, floorLevel: 0 }, connections: [], features: [] },
-                    { id: 'r4', name: 'Master Suite', category: 'bedroom', dimensions: "16' x 14'", areaSqFt: 224, position: { x: 10, y: 72, width: 42, height: 25, floorLevel: 0 }, connections: [], features: [] }
-                  ],
-                  walls: [], openings: [], circulationNotes: 'Direct core', rationale: 'Climate-adaptive design.', modeConsiderations: [], styleFeatures: []
-                },
-                rationale: 'Climate-adaptive concept with passive stack ventilation.',
-                tradeOffs: [],
-                createdAt: new Date().toISOString()
-              }
-            ],
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString()
-          }
-        ]);
-      }
-
+      if (cancelled) return;
+      loaded.sort((a, b) => (b.updatedAt || '').localeCompare(a.updatedAt || ''));
+      setProjects(loaded);
       setLoading(false);
     }
 
     loadUserProjects();
+    return () => { cancelled = true; };
   }, []);
 
-  const handleDelete = async (id: string) => {
-    await deleteProjectFromSupabase(id);
-    localStorage.removeItem(`project_${id}`);
-    setProjects(prev => prev.filter(p => p.id !== id));
+  const handleDelete = async (project: Project) => {
+    if (!window.confirm(`Delete "${project.title}" and all of its versions? This cannot be undone.`)) return;
+    if (project.storage === 'supabase') {
+      const deleted = await deleteProjectFromSupabase(project.id);
+      if (!deleted) {
+        setLoadError(`"${project.title}" could not be deleted from your account.`);
+        return;
+      }
+    }
+    try {
+      localStorage.removeItem(`project_${project.id}`);
+      localStorage.removeItem(`chat_${project.id}`);
+    } catch { /* localStorage unavailable */ }
+    setProjects((prev) => prev.filter((p) => p.id !== project.id));
   };
 
   return (
@@ -116,9 +90,29 @@ export default function DashboardPage() {
           </Link>
         </div>
 
+        {loadError && (
+          <div className="mb-8 border border-red-300 bg-red-50 px-4 py-3 font-sans text-xs text-red-700">{loadError}</div>
+        )}
+
         {loading ? (
           <div className="text-center font-mono text-xs text-stone-500 uppercase tracking-widest py-12">
-            Loading Real User Projects from Supabase...
+            Loading your projects…
+          </div>
+        ) : projects.length === 0 ? (
+          <div className="border border-stone-300 bg-white p-12 text-center space-y-4">
+            <h2 className="font-serif text-2xl text-stone-900">No projects yet</h2>
+            <p className="font-sans text-sm text-stone-600 max-w-lg mx-auto">
+              {signedIn
+                ? 'Create a project to generate a floor plan and 3D model from your plot and requirements.'
+                : 'Create a project to generate a floor plan and 3D model. Sign in first if you want it saved to your account; otherwise it is kept in this browser.'}
+            </p>
+            <Link
+              href="/onboarding"
+              className="inline-flex items-center gap-2 bg-terracotta-500 px-8 py-3.5 font-sans text-xs font-semibold uppercase tracking-widest text-white hover:bg-terracotta-600 transition-all"
+            >
+              Create Your First Project
+              <ArrowRight className="h-4 w-4" />
+            </Link>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -131,10 +125,10 @@ export default function DashboardPage() {
                   <div className="flex items-center justify-between font-mono text-[10px] uppercase text-stone-500 mb-3">
                     <span className="flex items-center gap-1">
                       <MapPin className="h-3 w-3 text-terracotta-500" />
-                      {project.location.city}, {project.location.country}
+                      {project.location?.city}, {project.location?.country}
                     </span>
                     <span className="bg-stone-100 px-2 py-0.5 font-bold text-stone-700">
-                      v{project.versions?.length || 1}
+                      {project.versions?.length || 0} {(project.versions?.length || 0) === 1 ? 'version' : 'versions'}
                     </span>
                   </div>
 
@@ -147,14 +141,17 @@ export default function DashboardPage() {
                       Style: {project.preferences?.primaryStyle || 'Modern'}
                     </span>
                     <span className="bg-[#F4F1EA] px-2.5 py-1 border border-stone-200">
-                      Plot: {project.siteInfo?.plotWidth || 40}' × {project.siteInfo?.plotDepth || 60}'
+                      Plot: {project.siteInfo?.plotWidth}' × {project.siteInfo?.plotDepth}'
+                    </span>
+                    <span className="bg-[#F4F1EA] px-2.5 py-1 border border-stone-200">
+                      {project.storage === 'supabase' ? 'Saved to account' : 'This browser only'}
                     </span>
                   </div>
                 </div>
 
                 <div className="mt-8 pt-4 border-t border-stone-200 flex items-center justify-between">
                   <button
-                    onClick={() => handleDelete(project.id)}
+                    onClick={() => handleDelete(project)}
                     className="text-stone-400 hover:text-red-600 transition-colors p-1"
                     title="Delete Project"
                   >

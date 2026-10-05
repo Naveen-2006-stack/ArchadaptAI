@@ -69,26 +69,117 @@ export interface DesignPreferences {
   customStyleNotes?: string;
 }
 
+/**
+ * Canonical coordinate contract (schemaVersion 2):
+ * x / width are a percentage of the PLOT WIDTH, y / height a percentage of the PLOT DEPTH.
+ * y = 0 is the road-facing (front) plot boundary. Feet are recovered as pct / 100 * plot dimension.
+ */
 export interface RoomPosition {
-  x: number; // percentage from top-left (0 to 100)
+  x: number;
   y: number;
   width: number;
   height: number;
   floorLevel: number; // 0 for ground, 1 for first floor, etc.
 }
 
+export type RoomType =
+  | 'entrance'
+  | 'living'
+  | 'dining'
+  | 'kitchen'
+  | 'utility'
+  | 'master_bedroom'
+  | 'bedroom'
+  | 'guest_room'
+  | 'bathroom'
+  | 'study'
+  | 'store'
+  | 'puja'
+  | 'parking'
+  | 'balcony'
+  | 'courtyard'
+  | 'lounge'
+  | 'stair'
+  | 'passage'
+  | 'dressing'
+  | 'terrace'
+  | 'void';
+
+export type RelationshipType =
+  | 'ADJACENT_TO'
+  | 'CONNECTED_TO'
+  | 'ATTACHED_TO'
+  | 'NEAR'
+  | 'PRIVATE_FROM'
+  | 'ACCESSIBLE_FROM';
+
+export interface RoomRelationship {
+  type: RelationshipType;
+  target: string; // room id
+}
+
+export type PlanBand = 'front' | 'middle' | 'rear';
+export type PlanSide = 'left' | 'center' | 'right';
+
+/** A room as reasoned by the planner (Gemini or the local rule engine) before geometry exists. */
+export interface ProgramRoom {
+  id: string;
+  name: string;
+  type: RoomType;
+  floor: number;
+  areaSqFt: number; // target area
+  band: PlanBand; // depth zone measured from the road
+  side: PlanSide; // position across the frontage, seen from the road
+  required: boolean; // true when it satisfies a hard requirement
+  attachedTo?: string; // room id this room must share a wall and a door with
+  relationships: RoomRelationship[];
+  features: string[];
+  accessible?: boolean;
+}
+
+/** Hard requirements the design is validated against. Never silently relaxed. */
+export interface DesignConstraints {
+  bedrooms: number;
+  bathrooms: number;
+  floors: number;
+  parkingCars: number;
+  requiredSpaces: string[]; // keys of DesignRequirements.spaces that are switched on
+  familySize: number;
+  budgetRange: DesignRequirements['budgetRange'];
+  modes: SpecialMode[];
+  style: string;
+}
+
+export interface DesignProgram {
+  rooms: ProgramRoom[];
+  stairSide: 'left' | 'right';
+  planningType: DesignSignature['planningType'];
+  circulationType: DesignSignature['circulationType'];
+  architecturalBrief?: ArchitecturalBrief;
+  rationale: string;
+  circulationNotes: string;
+  styleFeatures: string[];
+  modeConsiderations: { mode: SpecialMode; note: string }[];
+  appearance?: HouseAppearance;
+}
+
 export interface FloorPlanRoom {
   id: string;
   name: string;
   category: 'living' | 'bedroom' | 'kitchen' | 'bathroom' | 'circulation' | 'outdoor' | 'utility' | 'puja';
+  roomType?: RoomType;
   zoningCategory?: 'public' | 'semi_private' | 'private' | 'service' | 'circulation' | 'outdoor';
   privacyLevel?: 'high' | 'medium' | 'low';
-  dimensions: string; // e.g. "16' x 14'"
-  areaSqFt: number;
+  dimensions: string; // e.g. "16' x 14'" — derived from position, never authored separately
+  areaSqFt: number; // derived from position
   position: RoomPosition;
-  connections: string[]; // IDs of connected rooms
+  connections: string[]; // IDs of rooms reachable through a door/opening
   features: string[]; // e.g., ["Large North Window", "Direct Patio Access"]
   color?: string;
+  required?: boolean;
+  derived?: boolean; // inserted by the layout engine (stair, passage, terrace, void…)
+  attachedTo?: string;
+  relationships?: RoomRelationship[];
 }
 
 export interface FloorPlanWall {
@@ -99,6 +190,7 @@ export interface FloorPlanWall {
   y2: number;
   isExterior: boolean;
   thickness: number;
+  floorLevel?: number;
 }
 
 export interface FloorPlanOpening {
@@ -107,9 +199,13 @@ export interface FloorPlanOpening {
   wallId?: string;
   x: number;
   y: number;
-  width: number;
+  width: number; // feet
   label?: string;
   swingDirection?: 'inward_left' | 'inward_right' | 'outward' | 'sliding';
+  floorLevel?: number;
+  orientation?: 'horizontal' | 'vertical'; // direction of the wall the opening sits in
+  connects?: string[]; // room ids on either side; a single id means it opens to outside
+  isExterior?: boolean;
 }
 
 export interface FloorPlanLevel {
@@ -121,7 +217,8 @@ export interface FloorPlanLevel {
 export interface StaircaseDetails {
   id: string;
   location: string;
-  floorLevel: number;
+  floorLevel: number; // lowest floor served
+  topFloorLevel?: number; // highest floor served (same x/y footprint on every floor in between)
   x: number;
   y: number;
   width: number;
@@ -186,15 +283,27 @@ export interface DesignSignature {
 }
 
 export interface DesignGenerationMetadata {
-  intent: 'MODIFY_CURRENT_DESIGN' | 'GENERATE_ALTERNATIVE_CONCEPT';
+  intent: 'INITIAL_DESIGN' | 'MODIFY_CURRENT_DESIGN' | 'GENERATE_ALTERNATIVE_CONCEPT';
   sourceVersionId?: string;
-  modelId: string;
+  modelId: string; // actual engine that produced the room program
+  engine?: 'gemini' | 'local-rule-engine';
+  attempts?: number;
   generatedAt: string;
   diversityScore?: number;
   diversityLimited?: boolean;
 }
 
+export interface DesignIssue {
+  stage: 'schema' | 'requirements' | 'geometry' | 'spatial' | 'feasibility';
+  code: string;
+  message: string;
+}
+
 export interface StructuredDesignJSON {
+  schemaVersion?: number; // 2 = geometry produced by the deterministic layout engine
+  program?: DesignProgram; // the reasoning the geometry was derived from; What-If edits this
+  constraints?: DesignConstraints;
+  layoutNotes?: string[]; // trade-offs the layout engine had to make (never hidden)
   versionId?: string;
   conceptNumber?: number;
   architecturalBrief?: ArchitecturalBrief;
@@ -261,6 +370,8 @@ export interface Project {
   requirements: DesignRequirements;
   preferences: DesignPreferences;
   currentVersionId?: string;
+  /** Where the project lives: the user's Supabase account, or only this browser (guests / failed saves). */
+  storage?: 'supabase' | 'local';
   versions: FloorPlanVersion[];
   createdAt: string;
   updatedAt: string;
