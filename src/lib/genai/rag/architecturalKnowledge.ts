@@ -46,9 +46,18 @@ export const ARCHITECTURAL_KNOWLEDGE_BASE: ArchitecturalKnowledgeItem[] = [
   }
 ];
 
+const MODE_CATEGORY: Record<string, ArchitecturalKnowledgeItem['category']> = {
+  climate_adaptive: 'climate',
+  life_stage: 'lifestage',
+  budget_first: 'budget',
+  renovation: 'renovation'
+};
+
 export function getRelevantKnowledge(query: string, modes: string[]): string {
-  const matching = ARCHITECTURAL_KNOWLEDGE_BASE.filter(item => 
-    modes.includes(item.category) || query.toLowerCase().includes(item.category)
+  const wanted = new Set<string>(modes.map((mode) => MODE_CATEGORY[mode] || mode));
+  wanted.add('style');
+  const matching = ARCHITECTURAL_KNOWLEDGE_BASE.filter(item =>
+    wanted.has(item.category) || query.toLowerCase().includes(item.category)
   );
 
   if (matching.length === 0) {

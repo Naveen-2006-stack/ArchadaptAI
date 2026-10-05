@@ -1,40 +1,21 @@
-import { StructuredDesignJSON, FloorPlanRoom, FloorPlanWall, FloorPlanOpening } from './architectural';
+import { HouseAppearance, PlanBand, PlanSide, RoomType } from './architectural';
 
-export type DeltaAction = 'add' | 'modify' | 'remove' | 'reposition';
-export type DeltaEntity = 'room' | 'wall' | 'opening' | 'style' | 'mode';
+/**
+ * A What-If change is a small list of operations on the room programme of an existing design.
+ * The geometry is then re-derived by the layout engine and re-validated; the delta never carries coordinates.
+ */
+export type ProgramDeltaOp =
+  | { op: 'add_room'; type: RoomType; name?: string; floor?: number; areaSqFt?: number; band?: PlanBand; side?: PlanSide; attachedTo?: string }
+  | { op: 'remove_room'; target: string }
+  | { op: 'resize_room'; target: string; areaSqFt?: number; scale?: number }
+  | { op: 'move_room'; target: string; floor?: number; band?: PlanBand; side?: PlanSide; nextTo?: string }
+  | { op: 'rename_room'; target: string; name: string }
+  | { op: 'add_floor' }
+  | { op: 'set_appearance'; appearance: Partial<HouseAppearance> };
 
-export interface RoomChange {
-  name?: string;
-  category?: 'living' | 'bedroom' | 'kitchen' | 'bathroom' | 'circulation' | 'outdoor' | 'utility' | 'puja';
-  dimensions?: string;
-  areaSqFt?: number;
-  position?: {
-    x?: number;
-    y?: number;
-    width?: number;
-    height?: number;
-    floorLevel?: number;
-  };
-  features?: string[];
-  connections?: string[];
-  color?: string;
-}
-
-export interface DesignDeltaItem {
-  action: DeltaAction;
-  entity: DeltaEntity;
-  targetId?: string;
-  room?: FloorPlanRoom;
-  roomChanges?: RoomChange;
-  styleChange?: string;
-}
-
-export interface StructuredDesignDelta {
-  request: string;
-  isFeasible: boolean;
-  feasibilityExplanation?: string;
-  changes: DesignDeltaItem[];
-  tradeoffs: string[];
-  constraintsPreserved: string[];
+export interface ProgramDelta {
+  understood: boolean;
   summary: string;
+  tradeOffs: string[];
+  ops: ProgramDeltaOp[];
 }

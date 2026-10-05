@@ -6,7 +6,7 @@ import Navbar from '@/components/navigation/Navbar';
 import {
   Upload, MapPin, ArrowRight, ArrowLeft, Check, Sparkles, Wind, Users, DollarSign, RefreshCw, FileText, Image as ImageIcon, X
 } from 'lucide-react';
-import { SiteInfo, LocationInfo, DesignRequirements, SpecialMode, ArchitecturalStyle } from '@/types/architectural';
+import { SiteInfo, LocationInfo, DesignRequirements, SpecialMode, ArchitecturalStyle, Project } from '@/types/architectural';
 import { createProjectInSupabase } from '@/lib/services/projectService';
 import { supabase } from '@/lib/supabase/client';
 
@@ -15,8 +15,9 @@ export default function OnboardingPage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [step, setStep] = useState(1);
   const [isGenerating, setIsGenerating] = useState(false);
-  const [loadingStage, setLoadingStage] = useState('01 / ANALYZING SITE & LOCATION');
-  const [generationError, setGenerationError] = useState<string | null>(null);
+  const [loadingStage, setLoadingStage] = useState('');
+  const [elapsedSeconds, setElapsedSeconds] = useState(0);
+  const [generationError, setGenerationError] = useState<{ title: string; message: string; details: string[]; canUseLocalEngine: boolean; canRetry: boolean } | null>(null);
   const [user, setUser] = useState<any>(null);
 
   // File Upload State
@@ -90,151 +91,112 @@ export default function OnboardingPage() {
       kitchen: true,
       parkingCars: 1,
       balcony: true,
-      studyWorkspace: true,
-      storage: true,
+      studyWorkspace: false,
+      storage: false,
       prayerRoom: false,
-      courtyard: true,
+      courtyard: false,
       guestRoom: false,
       outdoorGarden: true
     },
-    customRequirements: '3 bedrooms, 2 bathrooms, 1 car parking, large living room, kitchen, dining, small study. Budget approx ₹40 lakh.'
+    customRequirements: ''
   });
 
   // Step 4: Modes & Style
   const [selectedModes, setSelectedModes] = useState<SpecialMode[]>(['climate_adaptive', 'life_stage', 'budget_first']);
   const [primaryStyle, setPrimaryStyle] = useState<ArchitecturalStyle>('Kerala Traditional');
 
-  const handleGenerate = async () => {
+  const handleGenerate = async (engine: 'auto' | 'local' = 'auto') => {
+    if (isGenerating) return;
     setIsGenerating(true);
     setGenerationError(null);
-    setLoadingStage('01 / ANALYZING SITE & LOCATION');
-    console.log('[ARCHADAPT Frontend] GENERATION START');
+    setElapsedSeconds(0);
+    setLoadingStage(engine === 'local' ? 'PLANNING WITH THE BUILT-IN RULE ENGINE' : 'AI PLANNER IS REASONING ABOUT YOUR BRIEF');
+    const startedAt = Date.now();
+    const ticker = setInterval(() => setElapsedSeconds(Math.round((Date.now() - startedAt) / 1000)), 1000);
 
-    const stageTimers: ReturnType<typeof setTimeout>[] = [
-      setTimeout(() => setLoadingStage('02 / UNDERSTANDING REQUIREMENTS'), 800),
-      setTimeout(() => setLoadingStage('03 / APPLYING DESIGN PREFERENCES'), 1600),
-      setTimeout(() => setLoadingStage('04 / DEVELOPING FLOOR PLAN'), 2800),
-      setTimeout(() => setLoadingStage('05 / GEMINI AI GENERATING DESIGN\u2026'), 4200),
-      setTimeout(() => setLoadingStage('05 / SPATIAL REASONING IN PROGRESS\u2026'), 20_000),
-      setTimeout(() => setLoadingStage('05 / VALIDATING ARCHITECTURAL CONCEPT'), 55_000),
-      setTimeout(() => setLoadingStage('05 / FINALISING FLOOR PLAN\u2026'), 85_000)
-    ];
-    const clearStageTimers = () => stageTimers.forEach(clearTimeout);
-
-    // Client-side 150-second timeout guard (Gemini 2.5 can take up to ~100s)
+    // The server allows two AI attempts within about 165 s; give it slightly longer before giving up.
     const abortController = new AbortController();
-    const clientTimeout = setTimeout(() => {
-      abortController.abort();
-    }, 150_000);
+    const clientTimeout = setTimeout(() => abortController.abort(), 185_000);
 
     try {
-      console.log('[ARCHADAPT Frontend] NAVIGATION START → /api/design/generate');
-
-      // Call GenAI API Route
+      const preferences = { modes: selectedModes, primaryStyle };
       const res = await fetch('/api/design/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         signal: abortController.signal,
-        body: JSON.stringify({
-          site: siteInfo,
-          location: locationInfo,
-          requirements,
-          preferences: { modes: selectedModes, primaryStyle }
-        })
+        body: JSON.stringify({ site: siteInfo, location: locationInfo, requirements, preferences, engine })
       });
 
-      clearTimeout(clientTimeout);
-      console.log('[ARCHADAPT Frontend] FRONTEND RESPONSE RECEIVED — status:', res.status);
+      let data: any = null;
+      try { data = await res.json(); } catch { /* handled below */ }
 
-      if (!res.ok) {
-        let errBody: any = {};
-        try { errBody = await res.json(); } catch { /* ignore */ }
-        const errMsg = errBody?.error || `Generation failed (HTTP ${res.status}). Please try again.`;
-        console.error('[ARCHADAPT Frontend] API ERROR:', errMsg);
-        setGenerationError(errMsg);
+      if (!res.ok || !data?.success) {
+        const status = data?.status as string | undefined;
+        setGenerationError({
+          title: status === 'INFEASIBLE' ? 'This brief does not fit the plot' : status === 'INVALID_DESIGN' ? 'No valid design was produced' : status === 'ENGINE_UNAVAILABLE' ? 'The AI planner is unavailable' : 'Generation failed',
+          message: data?.error || `The server answered HTTP ${res.status}. Please try again.`,
+          details: Array.isArray(data?.violatedConstraints) ? data.violatedConstraints : [],
+          canUseLocalEngine: !!data?.canUseLocalEngine,
+          canRetry: status !== 'INFEASIBLE'
+        });
         return;
       }
 
-      const data = await res.json();
       const design = data.design;
-      const rationale = data.rationale;
-
-      if (!design || !design.rooms) {
-        const errMsg = 'Generation returned an incomplete design. Please try again.';
-        console.error('[ARCHADAPT Frontend] INCOMPLETE DESIGN:', data);
-        setGenerationError(errMsg);
+      if (!design || !Array.isArray(design.rooms) || design.rooms.length === 0) {
+        setGenerationError({ title: 'Generation failed', message: 'The server returned an incomplete design. Nothing was saved.', details: [], canUseLocalEngine: false, canRetry: true });
         return;
       }
 
-      console.log(`[ARCHADAPT Frontend] DESIGN RECEIVED — model: ${data.aiModel}, rooms: ${design.rooms?.length}, floors: ${design.floorsCount}`);
-
+      setLoadingStage('SAVING THE VALIDATED DESIGN');
+      const rationale = data.rationale || design.rationale || '';
       const projectTitle = `${primaryStyle} Concept — ${locationInfo.city}`;
-      const activeUserId = user?.id || 'demo-user-id';
 
-      console.log('[ARCHADAPT Frontend] SUPABASE SAVE START');
-
-      // Save to Supabase
-      const savedProject = await createProjectInSupabase(
-        activeUserId,
-        projectTitle,
-        siteInfo,
-        locationInfo,
-        requirements,
-        { modes: selectedModes, primaryStyle },
-        design,
-        rationale
-      );
-
-      console.log('[ARCHADAPT Frontend] SUPABASE SAVE COMPLETE — project:', savedProject?.id || 'null (using local fallback)');
-
+      // Signed-in users save to Supabase under their own account (RLS). Guests keep the project in this browser.
+      let savedProject = null;
+      if (user?.id) {
+        savedProject = await createProjectInSupabase(user.id, projectTitle, siteInfo, locationInfo, requirements, preferences, design, rationale);
+      }
       const projectId = savedProject?.id || `proj-${Date.now()}`;
 
-      // Local storage fallback for offline dev resilience
       if (!savedProject) {
-        const fallbackProj = {
+        const now = new Date().toISOString();
+        const localProject: Project = {
           id: projectId,
+          userId: user?.id || 'guest',
           title: projectTitle,
           location: locationInfo,
           siteInfo,
           requirements,
-          preferences: { modes: selectedModes, primaryStyle },
+          preferences,
           currentVersionId: 'v1',
-          versions: [
-            {
-              id: 'v1',
-              projectId,
-              versionNumber: 1,
-              title: 'Initial Conceptual Floor Plan',
-              structuredDesign: design,
-              rationale,
-              tradeOffs: [
-                'Optimal north-south orientation reduces west solar heat gain.',
-                'Includes central courtyard for passive stack ventilation.'
-              ],
-              createdAt: new Date().toISOString()
-            }
-          ],
-          createdAt: new Date().toISOString(),
-          updatedAt: new Date().toISOString()
+          storage: 'local',
+          versions: [{ id: 'v1', projectId, versionNumber: 1, title: 'Initial Conceptual Floor Plan', structuredDesign: design, rationale, tradeOffs: design.layoutNotes || [], createdAt: now }],
+          createdAt: now,
+          updatedAt: now
         };
-        localStorage.setItem(`project_${projectId}`, JSON.stringify(fallbackProj));
+        try {
+          localStorage.setItem(`project_${projectId}`, JSON.stringify(localProject));
+        } catch {
+          setGenerationError({ title: 'The design could not be saved', message: 'The design was generated, but neither your account nor this browser could store it. Please try again.', details: [], canUseLocalEngine: false, canRetry: true });
+          return;
+        }
       }
 
-      console.log('[ARCHADAPT Frontend] NAVIGATION START → /workspace/' + projectId);
       router.push(`/workspace/${projectId}`);
     } catch (err: any) {
-      clearTimeout(clientTimeout);
       const isTimeout = err?.name === 'AbortError';
-      const errMsg = isTimeout
-        ? 'Generation timed out after 150 seconds. The server may be busy — please try again.'
-        : err?.message || 'An unexpected error occurred. Please try again.';
-      console.error('[ARCHADAPT Frontend] GENERATION ERROR:', errMsg);
-      setGenerationError(errMsg);
+      setGenerationError({
+        title: isTimeout ? 'Generation timed out' : 'Generation failed',
+        message: isTimeout ? 'The server did not answer within 3 minutes. Nothing was saved.' : err?.message || 'An unexpected error occurred. Nothing was saved.',
+        details: [],
+        canUseLocalEngine: isTimeout,
+        canRetry: true
+      });
     } finally {
-      clearStageTimers();
+      clearInterval(ticker);
       clearTimeout(clientTimeout);
       setIsGenerating(false);
-      setLoadingStage('01 / ANALYZING SITE & LOCATION');
     }
   };
 
@@ -384,6 +346,9 @@ export default function OnboardingPage() {
                   <option value="W">West Facing Road</option>
                   <option value="S">South Facing Road</option>
                   <option value="NE">North-East Facing Road</option>
+                  <option value="NW">North-West Facing Road</option>
+                  <option value="SE">South-East Facing Road</option>
+                  <option value="SW">South-West Facing Road</option>
                 </select>
               </div>
             </div>
@@ -527,12 +492,73 @@ export default function OnboardingPage() {
             </div>
 
             <div>
-              <label className="block font-mono text-[10px] uppercase text-stone-600 mb-2 font-bold">Natural Language Requirements</label>
+              <label className="block font-mono text-[10px] uppercase text-stone-600 mb-2 font-bold">Spaces the house must include</label>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                {([
+                  ['dining', 'Dining Room'],
+                  ['balcony', 'Balcony'],
+                  ['studyWorkspace', 'Study'],
+                  ['storage', 'Store Room'],
+                  ['prayerRoom', 'Puja Room'],
+                  ['courtyard', 'Courtyard'],
+                  ['guestRoom', 'Guest Room'],
+                  ['outdoorGarden', 'Garden']
+                ] as const).map(([key, label]) => {
+                  const active = requirements.spaces[key];
+                  return (
+                    <button
+                      key={key}
+                      type="button"
+                      onClick={() => setRequirements({ ...requirements, spaces: { ...requirements.spaces, [key]: !active } })}
+                      className={`flex items-center gap-2 px-3 py-2.5 border text-xs font-mono uppercase tracking-wider text-left transition-all ${
+                        active ? 'border-terracotta-500 bg-amber-50/40 text-stone-900 font-bold' : 'border-stone-300 bg-white text-stone-600 hover:border-stone-900'
+                      }`}
+                    >
+                      <span className={`flex h-3.5 w-3.5 items-center justify-center border ${active ? 'border-terracotta-500 bg-terracotta-500 text-white' : 'border-stone-400'}`}>
+                        {active && <Check className="h-2.5 w-2.5" />}
+                      </span>
+                      {label}
+                    </button>
+                  );
+                })}
+              </div>
+              <p className="font-sans text-[11px] text-stone-500 mt-2">
+                Living room and kitchen are always included. Everything ticked here is a hard requirement: the design is rejected if any is missing.
+              </p>
+            </div>
+
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-6">
+              <div>
+                <label className="block font-mono text-[10px] uppercase text-stone-600 mb-1">Car Parking</label>
+                <input
+                  type="number"
+                  min="0"
+                  max="4"
+                  value={requirements.spaces.parkingCars}
+                  onChange={(e) => setRequirements({ ...requirements, spaces: { ...requirements.spaces, parkingCars: Math.max(0, Number(e.target.value) || 0) } })}
+                  className="w-full border border-stone-300 px-4 py-3 font-sans text-sm font-semibold text-stone-900 focus:border-stone-900 focus:outline-none"
+                />
+              </div>
+              <div>
+                <label className="block font-mono text-[10px] uppercase text-stone-600 mb-1">Family Size</label>
+                <input
+                  type="number"
+                  min="1"
+                  max="20"
+                  value={requirements.familySize}
+                  onChange={(e) => setRequirements({ ...requirements, familySize: Math.max(1, Number(e.target.value) || 1) })}
+                  className="w-full border border-stone-300 px-4 py-3 font-sans text-sm font-semibold text-stone-900 focus:border-stone-900 focus:outline-none"
+                />
+              </div>
+            </div>
+
+            <div>
+              <label className="block font-mono text-[10px] uppercase text-stone-600 mb-2 font-bold">Preferences in your own words (optional)</label>
               <textarea
                 rows={2}
                 value={requirements.customRequirements}
                 onChange={(e) => setRequirements({ ...requirements, customRequirements: e.target.value })}
-                placeholder="e.g. 3 bedrooms, 2 bathrooms, 1 car parking, large living room, kitchen, dining..."
+                placeholder="Anything else the architect should know, e.g. large living room, elderly parents live with us, home office used daily..."
                 className="w-full border border-stone-300 p-3 font-sans text-xs text-stone-900 focus:border-stone-900 focus:outline-none"
               />
             </div>
@@ -632,25 +658,49 @@ export default function OnboardingPage() {
                   {loadingStage}
                 </p>
                 <p className="font-sans text-xs text-stone-400">
-                  Processing site constraints and running architectural validation...
+                  {elapsedSeconds}s elapsed. The planner's room programme is laid out and validated before anything is saved; this usually takes 20–90 seconds.
                 </p>
               </div>
             )}
 
-            {/* Error Message & Retry */}
+            {/* Error Message & Recovery */}
             {generationError && !isGenerating && (
-              <div className="p-5 border border-red-300 bg-red-50 text-center space-y-3">
-                <p className="font-mono text-xs uppercase tracking-wider text-red-700 font-bold">
-                  ⚠ Generation Failed
+              <div className="p-5 border border-red-300 bg-red-50 space-y-3">
+                <p className="font-mono text-xs uppercase tracking-wider text-red-700 font-bold text-center">
+                  {generationError.title}
                 </p>
-                <p className="font-sans text-xs text-red-600">{generationError}</p>
-                <button
-                  onClick={handleGenerate}
-                  className="inline-flex items-center gap-2 bg-stone-900 px-6 py-2.5 font-mono text-xs uppercase tracking-widest text-stone-50 hover:bg-stone-800 transition-all"
-                >
-                  <RefreshCw className="h-3 w-3" />
-                  Retry Generation
-                </button>
+                <p className="font-sans text-xs text-red-700 text-center">{generationError.message}</p>
+                {generationError.details.length > 0 && (
+                  <ul className="font-sans text-xs text-red-700 list-disc pl-5 space-y-1">
+                    {generationError.details.slice(0, 8).map((detail, index) => (
+                      <li key={index}>{detail}</li>
+                    ))}
+                  </ul>
+                )}
+                {!generationError.canRetry && (
+                  <p className="font-sans text-xs text-stone-700 text-center">
+                    Reduce the number of rooms, add a floor, or enter a larger plot in the earlier steps, then generate again.
+                  </p>
+                )}
+                <div className="flex flex-wrap items-center justify-center gap-3">
+                  {generationError.canRetry && (
+                    <button
+                      onClick={() => handleGenerate('auto')}
+                      className="inline-flex items-center gap-2 bg-stone-900 px-6 py-2.5 font-mono text-xs uppercase tracking-widest text-stone-50 hover:bg-stone-800 transition-all"
+                    >
+                      <RefreshCw className="h-3 w-3" />
+                      Retry
+                    </button>
+                  )}
+                  {generationError.canUseLocalEngine && (
+                    <button
+                      onClick={() => handleGenerate('local')}
+                      className="inline-flex items-center gap-2 border border-stone-900 px-6 py-2.5 font-mono text-xs uppercase tracking-widest text-stone-900 hover:bg-stone-100 transition-all"
+                    >
+                      Use the built-in rule engine instead
+                    </button>
+                  )}
+                </div>
               </div>
             )}
 
@@ -663,11 +713,11 @@ export default function OnboardingPage() {
                 Back
               </button>
               <button
-                onClick={handleGenerate}
+                onClick={() => handleGenerate("auto")}
                 disabled={isGenerating}
                 className="flex items-center gap-3 bg-terracotta-500 px-10 py-4 font-sans text-xs font-semibold uppercase tracking-widest text-white hover:bg-terracotta-600 transition-all shadow-md"
               >
-                {isGenerating ? 'Generating Concept...' : 'Generate 2D Conceptual Plan'}
+                {isGenerating ? 'Generating…' : 'Generate Design'}
                 <ArrowRight className="h-4 w-4" />
               </button>
             </div>

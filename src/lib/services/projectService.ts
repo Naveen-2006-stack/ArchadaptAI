@@ -73,13 +73,17 @@ export async function createProjectInSupabase(
         title: 'Initial Conceptual Floor Plan',
         structured_design: initialDesign,
         rationale,
-        trade_offs: [
-          'Optimal north-south orientation reduces west solar heat gain.',
-          'Includes central courtyard for passive stack ventilation.'
-        ]
+        trade_offs: initialDesign.layoutNotes || []
       })
       .select()
       .single();
+
+    if (verError || !versionData) {
+      // A project without its first design is useless and would show as an empty shell: remove it.
+      console.error('Error saving initial floor plan version:', verError);
+      await supabase.from('projects').delete().eq('id', projectId);
+      return null;
+    }
 
     if (versionData) {
       // Update active version
@@ -107,10 +111,7 @@ export async function createProjectInSupabase(
           title: 'Initial Conceptual Floor Plan',
           structuredDesign: initialDesign,
           rationale,
-          tradeOffs: [
-            'Optimal north-south orientation reduces west solar heat gain.',
-            'Includes central courtyard for passive stack ventilation.'
-          ],
+          tradeOffs: initialDesign.layoutNotes || [],
           createdAt: new Date().toISOString()
         }
       ],
@@ -145,7 +146,7 @@ export async function getUserProjectsFromSupabase(userId: string): Promise<Proje
       const site = p.site_inputs?.[0] || {};
       const reqs = p.design_requirements?.[0] || {};
       const prefs = p.design_preferences?.[0] || {};
-      const versionsList = (p.floor_plan_versions || []).map((v: any) => ({
+      const versionsList = (p.floor_plan_versions || []).slice().sort((a: any, b: any) => a.version_number - b.version_number).map((v: any) => ({
         id: v.id,
         projectId: p.id,
         versionNumber: v.version_number,
@@ -153,6 +154,8 @@ export async function getUserProjectsFromSupabase(userId: string): Promise<Proje
         structuredDesign: v.structured_design,
         rationale: v.rationale,
         tradeOffs: v.trade_offs || [],
+        parentVersionId: v.parent_version_id || undefined,
+        createdByPrompt: v.created_by_prompt || undefined,
         createdAt: v.created_at
       }));
 
@@ -203,5 +206,11 @@ export async function getUserProjectsFromSupabase(userId: string): Promise<Proje
 
 export async function deleteProjectFromSupabase(projectId: string): Promise<boolean> {
   const { error } = await supabase.from('projects').delete().eq('id', projectId);
+  return !error;
+}
+
+/** Makes a stored version the project's active one (used by Restore). RLS limits this to the owner. */
+export async function setCurrentVersionInSupabase(projectId: string, versionId: string): Promise<boolean> {
+  const { error } = await supabase.from('projects').update({ current_version_id: versionId, updated_at: new Date().toISOString() }).eq('id', projectId);
   return !error;
 }

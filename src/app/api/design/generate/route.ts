@@ -1,236 +1,101 @@
 import { NextResponse } from 'next/server';
 import { SiteInfo, LocationInfo, DesignRequirements, DesignPreferences } from '@/types/architectural';
-import { validateFloorPlan } from '@/lib/design/validateFloorPlan';
-import { validateRequirements } from '@/lib/design/validateRequirements';
-import { getRelevantKnowledge } from '@/lib/genai/rag/architecturalKnowledge';
-import { generateInitialDesign } from '@/lib/genai/modelAdapter';
-import { buildDesignPrompt, SYSTEM_ARCHITECTURAL_PROMPT } from '@/lib/genai/prompts';
-import { diffDesignPipeline } from '@/lib/debug/designPipelineDiff';
-import fs from 'fs';
-import path from 'path';
+import { generateDesign } from '@/lib/design/pipeline';
+import { countBedrooms, countRoomsOfType } from '@/lib/design/roomTypes';
 
-const GEMINI_TIMEOUT_MS = 120_000; // 120 seconds — Gemini 2.5 Pro/Flash typically takes 60–100s
+export const maxDuration = 180;
 
-async function callGeminiModelWithTimeout(apiKey: string, modelId: string, promptText: string): Promise<Response> {
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), GEMINI_TIMEOUT_MS);
+const DEV = process.env.NODE_ENV !== 'production';
+const ORIENTATIONS = ['N', 'S', 'E', 'W', 'NE', 'NW', 'SE', 'SW'];
 
-  try {
-    const res = await fetch(
-      `https://generativelanguage.googleapis.com/v1beta/models/${modelId}:generateContent?key=${apiKey}`,
-      {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        signal: controller.signal,
-        body: JSON.stringify({
-          contents: [
-            {
-              role: 'user',
-              parts: [{ text: `${SYSTEM_ARCHITECTURAL_PROMPT}\n\n${promptText}` }]
-            }
-          ],
-          generationConfig: { responseMimeType: 'application/json' }
-        })
-      }
-    );
-    clearTimeout(timeoutId);
-    return res;
-  } catch (err: any) {
-    clearTimeout(timeoutId);
-    if (err?.name === 'AbortError') {
-      throw new Error(`Gemini model ${modelId} timed out after ${GEMINI_TIMEOUT_MS / 1000}s`);
-    }
-    throw err;
-  }
+function invalidInput(site: SiteInfo, requirements: DesignRequirements): string | null {
+  const inRange = (value: unknown, min: number, max: number) => typeof value === 'number' && Number.isFinite(value) && value >= min && value <= max;
+  if (!inRange(site.plotWidth, 10, 1000) || !inRange(site.plotDepth, 10, 1000)) return 'Plot width and depth must be between 10 and 1000 ft.';
+  if (!ORIENTATIONS.includes(site.orientation)) return 'Road orientation is missing or invalid.';
+  if (!inRange(requirements.bedrooms, 1, 12)) return 'Bedrooms must be between 1 and 12.';
+  if (!inRange(requirements.bathrooms, 1, 12)) return 'Bathrooms must be between 1 and 12.';
+  if (!inRange(requirements.floors, 1, 4)) return 'Floors must be between 1 and 4.';
+  if (!requirements.spaces || typeof requirements.spaces !== 'object') return 'Requested spaces are missing.';
+  return null;
 }
 
 export async function POST(request: Request) {
-  const DEV = process.env.NODE_ENV !== 'production';
+  let body: any;
+  try {
+    body = await request.json();
+  } catch {
+    return NextResponse.json({ success: false, status: 'BAD_REQUEST', error: 'Request body is not valid JSON.' }, { status: 400 });
+  }
 
   try {
-    if (DEV) console.log('\n[ARCHADAPT] ===== GENERATION START =====');
-
-    const body = await request.json();
-    const { site, location, requirements, preferences } = body as {
+    const { site, location, requirements, preferences, engine } = body as {
       site: SiteInfo;
       location: LocationInfo;
       requirements: DesignRequirements;
       preferences: DesignPreferences;
+      engine?: 'auto' | 'local';
     };
-
     if (!site || !requirements || !preferences) {
-      return NextResponse.json({ error: 'Missing required site or requirements payload.' }, { status: 400 });
+      return NextResponse.json({ success: false, status: 'BAD_REQUEST', error: 'Missing required site or requirements payload.' }, { status: 400 });
     }
+    const problem = invalidInput(site, requirements);
+    if (problem) return NextResponse.json({ success: false, status: 'BAD_REQUEST', error: problem }, { status: 400 });
 
-    const apiKey = process.env.GENAI_API_KEY || process.env.GEMINI_API_KEY;
-    const ragContext = getRelevantKnowledge(requirements.customRequirements || '', preferences.modes);
+    if (DEV) console.log(`\n[ARCHADAPT] GENERATION START — ${requirements.bedrooms} bed / ${requirements.bathrooms} bath / ${requirements.floors} floor(s), ${site.plotWidth}x${site.plotDepth} ${site.orientation}, modes: ${(preferences.modes || []).join(',') || 'none'}`);
 
-    let rawGeminiDesign: any = null;
-    let rawDesign: any = null;
-    let rationale = '';
-    let usedModel = 'dynamic-constraint-solver';
-    let fallbackUsed = false;
-    let geminiAttempted = false;
-
-    if (apiKey && apiKey !== 'your-genai-api-key-here') {
-      const prompt = buildDesignPrompt(site, location, requirements, preferences, ragContext);
-      const candidateModels = ['gemini-2.5-flash', 'gemini-2.5-pro'];
-
-      for (const mId of candidateModels) {
-        geminiAttempted = true;
-        if (DEV) console.log(`[ARCHADAPT] GEMINI REQUEST START — model: ${mId}`);
-
-        try {
-          const res = await callGeminiModelWithTimeout(apiKey, mId, prompt);
-          if (DEV) console.log(`[ARCHADAPT] GEMINI RESPONSE RECEIVED — model: ${mId} status: ${res.status}`);
-
-          if (res.ok) {
-            if (DEV) console.log(`[ARCHADAPT] GEMINI JSON PARSE START — model: ${mId}`);
-            let geminiData: any;
-            try {
-              geminiData = await res.json();
-            } catch (parseErr) {
-              if (DEV) console.warn(`[ARCHADAPT] GEMINI JSON PARSE FAILURE — model: ${mId}`, parseErr);
-              continue;
-            }
-
-            const jsonText = geminiData.candidates?.[0]?.content?.parts?.[0]?.text;
-            if (jsonText) {
-              try {
-                rawGeminiDesign = JSON.parse(jsonText);
-                rawDesign = JSON.parse(JSON.stringify(rawGeminiDesign));
-                rationale = rawDesign.rationale || '';
-                usedModel = mId;
-                if (DEV) console.log(`[ARCHADAPT] GEMINI JSON PARSE SUCCESS — model: ${mId} rooms: ${rawDesign.rooms?.length}`);
-                break;
-              } catch (innerParseErr) {
-                if (DEV) console.warn(`[ARCHADAPT] GEMINI JSON PARSE FAILURE (inner) — model: ${mId}`, innerParseErr);
-              }
-            } else {
-              if (DEV) console.warn(`[ARCHADAPT] GEMINI RESPONSE STATUS OK but no JSON text — model: ${mId}`);
-            }
-          } else {
-            if (DEV) console.warn(`[ARCHADAPT] GEMINI RESPONSE STATUS — model: ${mId} HTTP ${res.status} (skipping)`);
-          }
-        } catch (mErr: any) {
-          if (DEV) console.warn(`[ARCHADAPT] GEMINI REQUEST ERROR — model: ${mId}:`, mErr?.message || mErr);
-        }
-      }
-    } else {
-      if (DEV) console.warn('[ARCHADAPT] No Gemini API key configured. Using dynamic constraint solver directly.');
-    }
-
-    // --- FALLBACK: Dynamic Constraint Solver ---
-    if (!rawDesign) {
-      fallbackUsed = true;
-      if (DEV) console.log(`[ARCHADAPT] FALLBACK: Engaging dynamic-constraint-solver (Gemini attempted: ${geminiAttempted})`);
-
-      try {
-        const generated = await generateInitialDesign(site, location, requirements, preferences);
-        rawDesign = generated.design;
-        rationale = generated.rationale;
-        usedModel = 'dynamic-constraint-solver';
-        if (DEV) console.log(`[ARCHADAPT] FALLBACK SUCCESS — rooms: ${rawDesign.rooms?.length}, floors: ${rawDesign.floorsCount}`);
-      } catch (fallbackErr: any) {
-        if (DEV) console.error('[ARCHADAPT] FALLBACK FAILURE:', fallbackErr?.message);
-        return NextResponse.json(
-          { error: 'All generation methods failed. Please try again.', details: fallbackErr?.message },
-          { status: 502 }
-        );
-      }
-    }
-
-    // --- REQUIREMENT VALIDATION ---
-    if (DEV) console.log('[ARCHADAPT] REQUIREMENT VALIDATION START');
-
-    const validation = validateRequirements(rawDesign, {
-      bedrooms: requirements.bedrooms,
-      bathrooms: requirements.bathrooms,
-      floors: requirements.floors,
-      parkingCars: requirements.spaces.parkingCars,
-      plotWidth: site.plotWidth,
-      plotDepth: site.plotDepth,
-      familySize: requirements.familySize,
-      requiredSpaces: requirements.spaces
+    const outcome = await generateDesign({
+      site: { ...site, plotWidth: Number(site.plotWidth), plotDepth: Number(site.plotDepth) },
+      location: location || { name: 'Site', city: 'Site', country: 'India', lat: 0, lng: 0 },
+      requirements,
+      preferences: { ...preferences, modes: preferences.modes || [] },
+      engine: engine === 'local' ? 'local' : 'auto'
     });
 
-    if (DEV) {
-      console.log(`[ARCHADAPT] REQUIREMENT VALIDATION COMPLETE — passed: ${validation.passed}`);
-      console.log(`  Requested bedrooms: ${validation.requestedBedrooms} | Generated: ${validation.generatedBedrooms}`);
-      console.log(`  Requested floors: ${validation.requestedFloors} | Generated: ${validation.generatedFloors}`);
-      if (validation.errors.length) console.warn('  Errors:', validation.errors);
-      if (validation.warnings.length) console.log('  Warnings:', validation.warnings);
+    if (outcome.status !== 'OK') {
+      if (DEV) console.warn(`[ARCHADAPT] GENERATION ${outcome.status} after ${outcome.attempts} attempt(s): ${outcome.reason}`, outcome.violatedConstraints);
+      return NextResponse.json(
+        {
+          success: false,
+          status: outcome.status,
+          error: outcome.reason,
+          reason: outcome.reason,
+          violatedConstraints: outcome.violatedConstraints,
+          attempts: outcome.attempts,
+          canUseLocalEngine: outcome.canUseLocalEngine
+        },
+        { status: outcome.status === 'ENGINE_UNAVAILABLE' ? 503 : 422 }
+      );
     }
 
-    // If hard bedroom/floor count failed on Gemini output AND fallback also fails, try running fallback with explicit counts
-    if (!validation.passed && !fallbackUsed) {
-      if (DEV) console.warn('[ARCHADAPT] Gemini output failed validation — engaging dynamic-constraint-solver as repair fallback');
-      try {
-        const repaired = await generateInitialDesign(site, location, requirements, preferences);
-        rawDesign = repaired.design;
-        rationale = repaired.rationale;
-        usedModel = 'dynamic-constraint-solver';
-        fallbackUsed = true;
-      } catch (repairErr: any) {
-        if (DEV) console.warn('[ARCHADAPT] Repair fallback also failed:', repairErr?.message);
-      }
-    }
-
-    const finalDesign = rawDesign;
-
-    // --- PIPELINE DIFF (debug only) ---
-    const diffReport = diffDesignPipeline(rawGeminiDesign, finalDesign);
-
+    const { design } = outcome;
     if (DEV) {
-      const timestamp = Date.now();
-      try {
-        const debugDir = path.join(process.cwd(), 'docs', 'debug');
-        if (!fs.existsSync(debugDir)) fs.mkdirSync(debugDir, { recursive: true });
-        if (rawGeminiDesign) fs.writeFileSync(path.join(debugDir, `raw-gemini-output-${timestamp}.json`), JSON.stringify(rawGeminiDesign, null, 2));
-        fs.writeFileSync(path.join(debugDir, `final-design-output-${timestamp}.json`), JSON.stringify(finalDesign, null, 2));
-      } catch {
-        // Ignore FS errors
-      }
-
-      const generatedBedrooms = finalDesign.rooms?.filter((r: any) => r.category === 'bedroom').length || 0;
-      const generatedFloors = finalDesign.floorsCount || finalDesign.floors?.length || 1;
-
-      console.log('\n=== ARCHADAPT GEMINI GENERATION DEBUG ===');
-      console.log(`MODEL USED       : ${usedModel}`);
-      console.log(`FALLBACK USED    : ${fallbackUsed ? 'YES (Dynamic Constraint Engine)' : 'NO (Direct Gemini Response)'}`);
-      console.log(`STYLE            : ${preferences.primaryStyle}`);
-      console.log(`FOOTPRINT SHAPE  : ${finalDesign.footprint?.shapeType || finalDesign.designSignature?.planningType}`);
-      console.log(`ROOM COUNT       : ${finalDesign.rooms?.length || 0}`);
-      console.log(`PIPELINE DIFF    : ${diffReport.summary}`);
-      console.log(`REQ BEDROOMS     : ${requirements.bedrooms} → GENERATED: ${generatedBedrooms}`);
-      console.log(`REQ FLOORS       : ${requirements.floors} → GENERATED: ${generatedFloors}`);
-      console.log('ROOM COORDINATES & DIMENSIONS:');
-      (finalDesign.rooms || []).forEach((r: any, idx: number) => {
-        console.log(`  ${idx + 1}. ${(r.name || r.id).padEnd(28)} | Category: ${(r.category || '').padEnd(12)} | Pos: x:${r.position?.x}, y:${r.position?.y}, w:${r.position?.width}, h:${r.position?.height}, fl:${r.position?.floorLevel || 0}`);
-      });
-      console.log('==========================================\n');
-      console.log('[ARCHADAPT] GENERATION RESPONSE SENT');
+      console.log(`[ARCHADAPT] GENERATION OK — engine: ${outcome.engine} (${outcome.modelId}), attempts: ${outcome.attempts}, rooms: ${design.rooms.length}, bedrooms: ${countBedrooms(design)}, floors: ${design.floorsCount}`);
+      if (outcome.warnings.length) console.log('  warnings:', outcome.warnings);
     }
 
     return NextResponse.json({
       success: true,
-      aiModel: usedModel,
-      fallbackUsed,
-      debugSignature: finalDesign.designSignature,
-      design: finalDesign,
-      rationale: rationale || finalDesign.rationale,
-      diffReport,
-      validationWarnings: validation.warnings,
+      status: 'OK',
+      design,
+      rationale: design.rationale,
+      aiModel: outcome.modelId,
+      engine: outcome.engine,
+      fallbackUsed: outcome.engine !== 'gemini',
+      notice: outcome.notice || null,
+      attempts: outcome.attempts,
+      validationWarnings: outcome.warnings,
+      layoutNotes: outcome.notes,
       validation: {
-        passed: validation.passed,
-        requestedBedrooms: validation.requestedBedrooms,
-        requestedFloors: validation.requestedFloors,
-        generatedBedrooms: validation.generatedBedrooms,
-        generatedFloors: validation.generatedFloors
+        passed: true,
+        requestedBedrooms: requirements.bedrooms,
+        requestedFloors: requirements.floors,
+        generatedBedrooms: countBedrooms(design),
+        generatedBathrooms: countRoomsOfType(design, 'bathroom'),
+        generatedFloors: design.floorsCount
       }
     });
   } catch (err: any) {
     console.error('[ARCHADAPT] GENERATION UNHANDLED ERROR:', err?.message || err);
-    return NextResponse.json({ error: err.message || 'Internal GenAI generation error' }, { status: 500 });
+    return NextResponse.json({ success: false, status: 'INTERNAL_ERROR', error: err?.message || 'Internal generation error' }, { status: 500 });
   }
 }
