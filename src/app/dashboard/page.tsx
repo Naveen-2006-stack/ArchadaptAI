@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import Navbar from '@/components/navigation/Navbar';
 import { Plus, MapPin, Trash2, ArrowRight } from 'lucide-react';
 import { Project } from '@/types/architectural';
@@ -9,6 +10,7 @@ import { supabase } from '@/lib/supabase/client';
 import { getUserProjectsFromSupabase, deleteProjectFromSupabase } from '@/lib/services/projectService';
 
 export default function DashboardPage() {
+  const router = useRouter();
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
   const [signedIn, setSignedIn] = useState(false);
@@ -17,24 +19,40 @@ export default function DashboardPage() {
   useEffect(() => {
     let cancelled = false;
 
+    // Listen for sign out while on dashboard
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_OUT' || !session) {
+        router.replace('/login');
+      }
+    });
+
     async function loadUserProjects() {
       setLoading(true);
       setLoadError(null);
       const loaded: Project[] = [];
 
-      // Projects saved to the signed-in user's account.
       try {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (user) {
-          if (!cancelled) setSignedIn(true);
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session?.user) {
+          router.replace('/login');
+          return;
+        }
+
+        const user = session.user;
+        if (!cancelled) setSignedIn(true);
+
+        try {
           const dbProjects = await getUserProjectsFromSupabase(user.id);
           loaded.push(...dbProjects.map((project) => ({ ...project, storage: 'supabase' as const })));
+        } catch {
+          if (!cancelled) setLoadError('Your account projects could not be loaded.');
         }
       } catch {
-        if (!cancelled) setLoadError('Your account projects could not be loaded. Projects stored in this browser are shown below.');
+        router.replace('/login');
+        return;
       }
 
-      // Projects created without signing in live in this browser.
+      // Also include any offline projects saved in this browser
       try {
         Object.keys(localStorage).filter((key) => key.startsWith('project_')).forEach((key) => {
           try {
@@ -51,8 +69,11 @@ export default function DashboardPage() {
     }
 
     loadUserProjects();
-    return () => { cancelled = true; };
-  }, []);
+    return () => {
+      cancelled = true;
+      subscription.unsubscribe();
+    };
+  }, [router]);
 
   const handleDelete = async (project: Project) => {
     if (!window.confirm(`Delete "${project.title}" and all of its versions? This cannot be undone.`)) return;

@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useMemo, useRef } from 'react';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import FloorPlan2DRenderer from '@/components/canvas/FloorPlan2DRenderer';
 import Massing3DViewer from '@/components/canvas/Massing3DViewer';
@@ -26,6 +26,7 @@ const WELCOME: WhatIfMessage = {
 type LoadState = 'loading' | 'ready' | 'not_found';
 
 export default function WorkspacePage() {
+  const router = useRouter();
   const params = useParams();
   const projectId = params?.id as string;
 
@@ -46,20 +47,36 @@ export default function WorkspacePage() {
     if (!projectId) return;
     let cancelled = false;
 
+    // Listen for sign out
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === 'SIGNED_OUT' || !session) {
+        router.replace('/login');
+      }
+    });
+
     async function load() {
       let found: Project | null = null;
       let signedIn = false;
 
       try {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (user) {
-          signedIn = true;
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session?.user) {
+          router.replace(`/login?next=/workspace/${projectId}`);
+          return;
+        }
+
+        const user = session.user;
+        signedIn = true;
+        try {
           const projects = await getUserProjectsFromSupabase(user.id);
           const match = projects.find((p) => p.id === projectId);
           if (match) found = { ...match, storage: 'supabase' };
+        } catch (err) {
+          console.warn('[Workspace] Supabase load failed, checking this browser:', err);
         }
-      } catch (err) {
-        console.warn('[Workspace] Supabase load failed, checking this browser:', err);
+      } catch {
+        router.replace(`/login?next=/workspace/${projectId}`);
+        return;
       }
 
       if (!found) {
@@ -101,8 +118,11 @@ export default function WorkspacePage() {
     }
 
     load();
-    return () => { cancelled = true; };
-  }, [projectId]);
+    return () => {
+      cancelled = true;
+      subscription.unsubscribe();
+    };
+  }, [projectId, router]);
 
   useEffect(() => {
     chatEndRef.current?.scrollIntoView({ behavior: 'smooth' });

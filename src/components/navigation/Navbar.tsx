@@ -2,13 +2,14 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { Compass, LogOut, FolderKanban, Plus } from 'lucide-react';
 import AuthModal from '@/components/auth/AuthModal';
 import { supabase } from '@/lib/supabase/client';
 
 export default function Navbar() {
   const pathname = usePathname();
+  const router = useRouter();
   const [isAuthOpen, setIsAuthOpen] = useState(false);
   const [user, setUser] = useState<{ name: string; email: string; avatarUrl?: string } | null>(null);
 
@@ -24,8 +25,8 @@ export default function Navbar() {
       }
     });
 
-    // Listen for auth state changes (Google Sign In / Sign Out)
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+    // Listen for auth state changes
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
       if (session?.user) {
         setUser({
           name: session.user.user_metadata?.full_name || session.user.email?.split('@')[0] || 'Architect',
@@ -34,15 +35,19 @@ export default function Navbar() {
         });
       } else {
         setUser(null);
+        if (event === 'SIGNED_OUT' && (pathname === '/dashboard' || pathname?.startsWith('/workspace'))) {
+          router.replace('/login');
+        }
       }
     });
 
     return () => subscription.unsubscribe();
-  }, []);
+  }, [pathname, router]);
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
     setUser(null);
+    router.replace('/login');
   };
 
   const navItems = [
@@ -118,12 +123,12 @@ export default function Navbar() {
               </div>
             ) : (
               <div className="flex items-center gap-3">
-                <button
-                  onClick={() => setIsAuthOpen(true)}
+                <Link
+                  href="/login"
                   className="hidden sm:inline-block font-sans text-xs font-semibold uppercase tracking-widest text-stone-700 hover:text-stone-900 px-3 py-2"
                 >
                   Sign In
-                </button>
+                </Link>
                 <Link
                   href="/onboarding"
                   className="flex items-center gap-2 bg-stone-900 px-6 py-3 font-sans text-xs font-semibold uppercase tracking-widest text-stone-50 hover:bg-stone-800 transition-all shadow-sm"
